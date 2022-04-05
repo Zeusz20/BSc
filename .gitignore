@@ -3,7 +3,7 @@
 **/out
 **/*.iml
 
+**/__pycache__
 server/projects/
 server/.env
 server/db.sqlite3
-server/main/__pycache__
