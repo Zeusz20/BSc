@@ -1,0 +1,32 @@
+<nav class="row d-flex align-items-center bg-secondary py-2">
+    <div class="col d-flex justify-content-center">
+        <!-- Show account icon and username -->
+        <table>
+            <tr>
+                <td>
+                    {% load static %}
+                    <img src="{% static 'main/img/account.png' %}" alt="account">
+                </td>
+                <td style="color: white">{{ request.user.username }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col d-flex justify-content-center">
+        <span lang="en"><a href="/user/home/" class="btn btn-secondary">My Projects</a></span>
+        <span lang="hu"><a href="/user/home/" class="btn btn-secondary">Saját Projektjeim</a></span>
+    </div>
+    <div class="col d-flex justify-content-center">
+        <span lang="en"><a href="/user/search/" class="btn btn-secondary">Browse Projects</a></span>
+        <span lang="hu"><a href="/user/search/" class="btn btn-secondary">Projekt Kereső</a></span>
+    </div>
+    <div class="col d-flex justify-content-center">
+        <span lang="en"><a href="/user/settings/" class="btn btn-secondary">Settings</a></span>
+        <span lang="hu"><a href="/user/settings/" class="btn btn-secondary">Beállítások</a></span>
+    </div>
+    <div class="col d-flex justify-content-center">
+        <span lang="en"><a href="/user/logout/" class="btn btn-secondary">Log Out</a></span>
+        <span lang="hu"><a href="/user/logout/" class="btn btn-secondary">Kijelentkezés</a></span>
+    </div>
+</nav>
+
+<br>

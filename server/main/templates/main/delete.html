@@ -1,0 +1,39 @@
+<!-- Delete Project Modal -->
+<div id="delete-{{ project.id }}" class="modal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span lang="en">Delete Project</span>
+                    <span lang="hu">Projekt Törlése</span>
+                </p>
+                <button type="button" data-bs-dismiss="modal" class="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">
+                    <span lang="en">Surely delete: <b>{{ project.name }}</b>?</span>
+                    <span lang="hu">Biztosan törli: <b>{{ project.name }}</b>?</span>
+                </p>
+                <form method="post" enctype="multipart/form-data" action="/projects/">
+                    {% csrf_token %}
+                    <input type="hidden" name="type" value="delete">
+                    <input type="hidden" name="id" value="{{ project.id }}">
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="form-control btn btn-danger">
+                                <span lang="en">Delete</span>
+                                <span lang="hu">Törlés</span>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button type="button" data-bs-dismiss="modal" class="form-control btn btn-secondary">
+                                <span lang="en">Cancel</span>
+                                <span lang="hu">Mégse</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

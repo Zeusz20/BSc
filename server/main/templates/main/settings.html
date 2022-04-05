@@ -1,0 +1,56 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="row d-flex justify-content-center">
+    <span lang="en"><h4>Change E-mail</h4></span>
+    <span lang="hu"><h4>E-mail Változtatása</h4></span>
+    <p class="lead">
+        <span lang="en">Current: {{ request.user.email }}</span>
+        <span lang="hu">Jelenlegi: {{ request.user.email }}</span>
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="email">
+        <span lang="en">E-mail:</span>
+        <span lang="hu">E-mail:</span>
+        <div class="input-group">
+            <input type="email" name="email" class="form-control" required>
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary">
+                    <span lang="en">Submit</span>
+                    <span lang="hu">Rendben</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<hr>
+
+<div class="row">
+    <span lang="en"><h4>Change Password</h4></span>
+    <span lang="hu"><h4>Jelszó Változtatása</h4></span>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="password">
+        <span lang="en">Old password:</span>
+        <span lang="hu">Régi jelszó:</span>
+        <input type="password" name="old_password" minlength="8" class="form-control" required>
+        <br>
+        <span lang="en">New password:</span>
+        <span lang="hu">Új jelszó:</span>
+        <input type="password" name="new_password1" minlength="8" class="form-control" required>
+        <br>
+        <span lang="en">Confirm new password:</span>
+        <span lang="hu">Új jelszó megerősítése:</span>
+        <input type="password" name="new_password2" minlength="8" class="form-control" required>
+        <br>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-secondary my-2">
+                <span lang="en">Submit</span>
+                <span lang="hu">Rendben</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

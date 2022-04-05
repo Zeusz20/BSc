@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<p class="lead">
+    <span lang="en">Already have a Cloud account? <br> Click <a href="/user/login/">HERE</a> to log in.</span>
+    <span lang="hu">Már van Felhő fiókja? <br> Kattintson <a href="/user/login/">IDE</a> a bejelentkezéshez.</span>
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="type" value="register">
+    <span lang="en">Username:</span>
+    <span lang="hu">Felhasználónév:</span>
+    <input type="text" name="username" minlength="4" class="form-control" required>
+    <br>
+    <span lang="en">E-mail:</span>
+    <span lang="hu">E-mail:</span>
+    <input type="email" name="email" class="form-control" required>
+    <br>
+    <span lang="en">Password:</span>
+    <span lang="hu">Jelszó:</span>
+    <input type="password" name="password1" minlength="8" class="form-control" required>
+    <br>
+    <span lang="en">Confirm Password:</span>
+    <span lang="hu">Jelszó Megerősítése:</span>
+    <input type="password" name="password2" minlength="8" class="form-control" required>
+    <br> <br>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-secondary">
+            <span lang="en">Register</span>
+            <span lang="hu">Regisztráció</span>
+        </button>
+    </div>
+</form>
+{% endblock content %}

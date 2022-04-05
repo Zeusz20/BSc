@@ -1,0 +1,29 @@
+<!-- Update Project Modal -->
+<div id="upload" class="modal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span lang="en">Upload Project</span>
+                    <span lang="hu">Projekt Feltöltése</span>
+                </p>
+                <button type="button" data-bs-dismiss="modal" class="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="/projects/">
+                    {% csrf_token %}
+                    <input type="hidden" name="type" value="upload">
+                    <div class="input-group">
+                        <input type="file" accept=".gwp" name="file" class="form-control">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary">
+                                <span lang="en">Upload</span>
+                                <span lang="hu">Feltöltés</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

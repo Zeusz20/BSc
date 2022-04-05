@@ -1,0 +1,64 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+{% if request.path == '/user/home/' %}
+    <div class="row">
+        <div class="col d-flex justify-content-start">
+            <h4>
+                <span lang="en">My Projects</span>
+                <span lang="hu">Saját Projektjeim</span>
+            </h4>
+        </div>
+        <div class="col d-flex justify-content-end">
+            <p class="lead" style="display: inline">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#upload" class="lead link-primary">
+                    <span lang="en">Upload new project</span>
+                    <span lang="hu">Új projekt feltötlése</span>
+                </a>
+                {% include 'main/upload.html' %}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <h4>
+        <span lang="en">Browse Projects</span>
+        <span lang="hu">Projekt Kereső</span>
+    </h4>
+{% endif %}
+
+<p class="lead">
+    {# Had to do with session.lang because of the IDs #}
+    <form method="get">
+        <div class="input-group">
+            {% if request.session.lang == 'en' %}
+                <input id="search-bar" type="text" name="query" class="form-control" placeholder="Search...">
+            {% else %}
+                <input id="search-bar" type="text" name="query" class="form-control" placeholder="Keresés...">
+            {% endif %}
+
+            {% load static %}
+            <button type="submit" class="btn btn-secondary">
+                <img src="{% static 'main/img/search.png' %}" alt="search">
+            </button>
+        </div>
+    </form>
+</p>
+<hr>
+{% include 'main/projects.html' %}
+
+{% if pages.has_previous %}
+    <a href="{{ request.path }}?query={{ request.GET.query }}&page={{ pages.previous_page_number }}">
+        <span lang="en"><< Previous</span>
+        <span lang="hu"><< Előző</span>
+    </a>
+{% endif %}
+
+{% if pages.has_previous and pages.has_next %} | {% endif %}
+
+{% if pages.has_next %}
+    <a href="{{ request.path }}?query={{ request.GET.query }}&page={{ pages.next_page_number }}">
+        <span lang="en">Next >></span>
+        <span lang="hu">Következő >></span>
+    </a>
+{% endif %}
+{% endblock content %}

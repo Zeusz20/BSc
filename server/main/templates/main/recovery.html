@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<p class="lead">
+    <span lang="en">Recover your forgotten password.</span>
+    <span lang="hu">Elfelejtett jelszó visszaállítása.</span>
+</p>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="type" value="recovery">
+    <span lang="en">Username:</span>
+    <span lang="hu">Felhasználónév:</span>
+    <div class="input-group">
+        <input type="text" name="username" class="form-control" required>
+        <div class="input-group-append">
+            <button class="btn btn-secondary">
+                <span lang="en">Submit</span>
+                <span lang="hu">Rendben</span>
+            </button>
+        </div>
+    </div>
+
+    <br> <br>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <span lang="en"><a href="/user/login/" class="lead">Log In</a></span>
+            <span lang="hu"><a href="/user/login/" class="lead">Bejelentekzés</a></span>
+        </div>
+        <div class="col d-flex justify-content-center">
+            <span lang="en"><a href="/user/register/" class="lead">Register</a></span>
+            <span lang="hu"><a href="/user/register/" class="lead">Regisztráció</a></span>
+        </div>
+    </div>
+</form>
+{% endblock content %}

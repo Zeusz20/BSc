@@ -1,0 +1,55 @@
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                <span lang="en">Author</span>
+                <span lang="hu">Készítő</span>
+            </th>
+            <th>
+                <span lang="en">Name</span>
+                <span lang="hu">Név</span>
+            </th>
+            <th>
+                <span lang="en">Description</span>
+                <span lang="hu">Leírás</span>
+            </th>
+            <th><!-- Controls go here --></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for project in pages.object_list %}
+        <tr class="search-row">
+            <td style="width: 10%" class="gw-author">{{ project.author }}</td>
+            <td style="width: 15%" class="gw-name">{{ project.name }}</td>
+            <td style="width: 45%" class="gw-description">{{ project.description }}</td>
+            <td style="width: 20%">
+                <div class="btn-group" style="float: right">
+                    <!-- Update Button -->
+                    {% if request.path == '/user/home/' %}
+                        <button data-bs-toggle="modal" data-bs-target="#update-{{ project.id }}" class="btn btn-outline-secondary border-0">
+                            {% load static %}
+                            <img src="{% static 'main/img/update.png' %}" alt="update">
+                        </button>
+                        {% include 'main/update.html' %}
+                    {% endif %}
+
+                    <!-- Download Button -->
+                    <a href="/projects/{{ project.file }}" class="btn btn-outline-secondary border-0">
+                        {% load static %}
+                        <img src="{% static 'main/img/download.png' %}" alt="download">
+                    </a>
+
+                    <!-- Delete Button -->
+                    {% if request.path == '/user/home/' %}
+                        <button data-bs-toggle="modal" data-bs-target="#delete-{{ project.id }}" class="btn btn-outline-secondary border-0">
+                            {% load static %}
+                            <img src="{% static 'main/img/del.png' %}" alt="delete">
+                        </button>
+                        {% include 'main/delete.html' %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
