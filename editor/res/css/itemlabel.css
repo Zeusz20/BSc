@@ -1,0 +1,17 @@
+.hyperlink {
+    -fx-text-fill: black;
+    -fx-underline: false;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: turquoise;
+    -fx-underline: true;
+}
+
+.hyperlink:focused {
+    -fx-border-color: transparent;
+}
+
+.tree-item:selected {
+
+}
