@@ -5,8 +5,8 @@ import com.zeusz.bsc.core.Project;
 import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.gui.IconButton;
 import com.zeusz.bsc.editor.gui.workspace.form.Row;
-import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.localization.Language;
+import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 import com.zeusz.bsc.editor.validation.ValidationHint;
 import com.zeusz.bsc.editor.validation.ValidationIcon;
@@ -26,7 +26,7 @@ public class NavigationBar extends BorderPane implements Drawable, ValidationHin
 
     static {
         try {
-            MENU_CONFIG = new Ini(ResourceLoader.getFile("menu.ini"));
+            MENU_CONFIG = new Ini(ResourceLoader.getFile("config/menu.ini"));
         }
         catch(Exception e) {
             MENU_CONFIG = null;

@@ -14,11 +14,16 @@ final class LangConfig {
 
     LangConfig() {
         try {
+            // load/create user's config
             File file = new File(IOManager.getInstance().getHomeDir(), "config.ini");
-            config = new Ini(file);
 
-            if(!file.exists() && file.createNewFile())
-                setLanguage(Language.EN);
+            if(!file.exists() && file.createNewFile()) {
+                config = new Ini(file);  // load ini after creating file
+                setLanguage(Language.getLanguageByTag("en"));
+            }
+            else {
+                config = new Ini(file);  // file already exists
+            }
         }
         catch(IOException e) {
             // couldn't read config
@@ -38,8 +43,8 @@ final class LangConfig {
     }
 
     Language getLanguage() {
-        String tag = config.get("editor", "lang");
-        return (config != null) ? Language.getLanguageByTag(tag) : Language.EN;
+        String tag = (config != null) ? config.get("editor", "lang") : null;
+        return Language.getLanguageByTag(tag);
     }
 
 }
