@@ -16,9 +16,9 @@ public class AttributeWindow extends Modal {
         attributes = new ComboBox<>();
         attributes.getItems().addAll(Editor.getInstance().getProject().getItemList(Attribute.class));
         attributes.setPromptText(Localization.localize("window.choose_attr"));
-        attributes.setPrefWidth(Modal.SMALL[0]);    // HBox::setHgrow doesn't work
+        attributes.setPrefWidth(Size.SMALL.width);    // HBox::setHgrow doesn't work
 
-        init(Modal.SMALL);
+        init(Size.SMALL);
     }
 
     public Attribute getSelected() { return attributes.getValue(); }

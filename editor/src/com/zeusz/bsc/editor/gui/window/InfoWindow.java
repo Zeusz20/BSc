@@ -7,7 +7,7 @@ public class InfoWindow extends Modal {
 
     public InfoWindow(String message) {
         this.message = message;
-        init(Modal.SMALL);
+        init(Size.SMALL);
     }
 
     @Override

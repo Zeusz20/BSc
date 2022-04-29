@@ -2,21 +2,16 @@ package com.zeusz.bsc.editor.gui.workspace;
 
 import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.editor.gui.Box;
-import com.zeusz.bsc.editor.gui.Prompt;
-import com.zeusz.bsc.editor.gui.Scrollable;
+import com.zeusz.bsc.editor.gui.*;
 import com.zeusz.bsc.editor.gui.explorer.SideMenu;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
 import com.zeusz.bsc.editor.validation.ValidationHint;
-import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.validation.ValidationIcon;
 import com.zeusz.bsc.editor.localization.Localization;
 
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +43,7 @@ public abstract class Workspace<T extends Item> extends BorderPane implements Dr
         this.fields = new ArrayList<>();
 
         root = new Box();
-        root.setPadding(new Insets(20.0));
+        root.setPadding(Style.PADDING_LARGE);
         root.setFillWidth(true);
 
         draw();     // render fx children
@@ -63,8 +58,8 @@ public abstract class Workspace<T extends Item> extends BorderPane implements Dr
         String text = Localization.capLocalize("word." + type) + " " + Localization.localize("word.editor");
         Label title = new Label(text);
 
-        title.setFont(Font.font(22.0));
-        title.setPadding(new Insets(0.0, 0.0, 5.0, 0.0));
+        title.setFont(Style.FONT_LARGE);
+        title.setPadding(Style.PADDING_BOTTOM);
 
         return title;
     }

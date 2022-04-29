@@ -5,6 +5,7 @@ import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Pair;
 import com.zeusz.bsc.editor.gui.Box;
 import com.zeusz.bsc.editor.gui.IconButton;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
 import com.zeusz.bsc.editor.gui.window.AttributeWindow;
 import com.zeusz.bsc.editor.gui.window.Modal;
@@ -13,7 +14,6 @@ import com.zeusz.bsc.editor.localization.Localization;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,11 +58,11 @@ public class ObjectPane extends Workspace<Object> {
             });
         });
 
-        label.setFont(Font.font(16.0));
+        label.setFont(Style.FONT_SMALL);
         item.getAttributes().forEach(it -> attributeList.addRow(new AttributeRow(attributeList, it)));  // populate attributeList
         fields.add(attributeList);
 
-        return new Box(new Row(label, Row.getFiller(), addBtn), attributeList);
+        return new Box(new Row(label, addBtn), attributeList);
     }
 
     @SuppressWarnings("unchecked")

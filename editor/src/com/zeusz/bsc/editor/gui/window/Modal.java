@@ -2,9 +2,9 @@ package com.zeusz.bsc.editor.gui.window;
 
 import com.zeusz.bsc.editor.Editor;
 import com.zeusz.bsc.editor.gui.FixedButton;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.localization.Localization;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -14,7 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -35,10 +34,13 @@ public abstract class Modal extends Stage {
     protected static final FixedButton cancelBtn = new FixedButton(Localization.capLocalize("word.cancel"));
 
     /* Meta data */
-    protected static final double[] SMALL = new double[]{ 366.0, 141.0 };
-    protected static final double[] MEDIUM = new double[]{ 635.0, 267.0 };
-    protected static final double[] LARGE = new double[]{ 800.0, 600.0 };
-    public enum State { APPLY, DISCARD, CANCEL}
+    public enum State { APPLY, DISCARD, CANCEL }
+
+    protected enum Size {
+        SMALL(366.0, 141.0), MEDIUM(635.0, 267.0), LARGE(800.0, 600.0);
+        double width, height;
+        Size(double width, double height) { this.width = width; this.height = height; }
+    }
 
     /* Class methods and fields */
     protected State state;
@@ -63,17 +65,14 @@ public abstract class Modal extends Stage {
         cancelBtn.setId(CANCEL_BTN_ID);
     }
 
-    private void setSize(double[] size) {
-        setWidth(size[0]);
-        setHeight(size[1]);
-    }
-
     public void setOnClose(Runnable event) { this.onClose = event; }
 
     public State getState() { return state; }
 
-    public void init(double[] size) {
-        setSize(size);
+    public void init(Size size) {
+        setWidth(size.width);
+        setHeight(size.height);
+
         final Pane root = getContent();
         if(root == null) return;
 
@@ -130,8 +129,8 @@ public abstract class Modal extends Stage {
     protected static final class Content extends BorderPane {
         private Content(Button... controls) {
             HBox controlPane = new HBox(controls);
-            controlPane.setSpacing(8.0);
-            controlPane.setPadding(new Insets(5.0));
+            controlPane.setSpacing(Style.SPACING_MEDIUM);
+            controlPane.setPadding(Style.PADDING_SMALL);
             controlPane.setAlignment(Pos.BOTTOM_RIGHT);
             controlPane.setId("controls");
             controlPane.getStylesheets().add("css/border.css");
@@ -144,9 +143,9 @@ public abstract class Modal extends Stage {
             Text text = new Text(message);
             StackPane textPane = new StackPane(text);
             text.setFill(Color.DIMGRAY.darker());
-            text.setFont(Font.font(18.0));
-            textPane.setStyle("-fx-background-color: white");
-            textPane.setPadding(new Insets(10.0));
+            text.setFont(Style.FONT_MEDIUM);
+            textPane.setStyle(Style.BG_WHITE);
+            textPane.setPadding(Style.PADDING_MEDIUM);
             textPane.setAlignment(Pos.TOP_LEFT);
             setCenter(textPane);
         }
@@ -154,7 +153,7 @@ public abstract class Modal extends Stage {
         /* Display form and controls */
         public Content(Pane form, Button... controls) {
             this(controls);
-            form.setPadding(new Insets(10.0));
+            form.setPadding(Style.PADDING_MEDIUM);
             setCenter(form);
         }
     }

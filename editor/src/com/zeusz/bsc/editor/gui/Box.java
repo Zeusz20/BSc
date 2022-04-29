@@ -8,7 +8,7 @@ public class Box extends VBox {
 
     public Box(Node... children) {
         super(children);
-        setSpacing(10.0);
+        setSpacing(Style.SPACING_LARGE);
     }
 
 }

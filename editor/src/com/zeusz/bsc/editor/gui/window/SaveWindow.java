@@ -6,7 +6,7 @@ import com.zeusz.bsc.editor.localization.Localization;
 public class SaveWindow extends Modal {
 
     public SaveWindow() {
-        init(Modal.SMALL);
+        init(Size.SMALL);
     }
 
     @Override

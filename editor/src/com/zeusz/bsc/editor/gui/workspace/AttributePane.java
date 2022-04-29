@@ -3,13 +3,13 @@ package com.zeusz.bsc.editor.gui.workspace;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.editor.gui.Box;
 import com.zeusz.bsc.editor.gui.IconButton;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
 import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,12 +33,12 @@ public class AttributePane extends Workspace<Attribute> {
         IconButton addBtn = new IconButton("img/add.png");
         ItemList valueList = new ItemList();
 
-        label.setFont(Font.font(16.0));
+        label.setFont(Style.FONT_SMALL);
         addBtn.setOnAction(event -> valueList.addRow(new ValueRow(valueList, "")));
         item.getValues().forEach(it -> valueList.addRow(new ValueRow(valueList, it)));  // populate valueList
         fields.add(valueList);
 
-        return new Box(new Row(label, Row.getFiller(), addBtn), valueList);
+        return new Box(new Row(label, addBtn), valueList);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.zeusz.bsc.core.Item;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.gui.Drawable;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.control.Hyperlink;
@@ -28,13 +29,12 @@ public class SideMenu extends VBox implements Drawable {
     private Tab objectTab, attributeTab, questionTab;
 
     public SideMenu() {
-        final double width = 200.0;
-        setWidth(width);
-        setStyle("-fx-background-color: white");
+        setWidth(Style.SIDE_BAR_WIDTH);
+        setStyle(Style.BG_WHITE);
 
-        objectTab = new Tab(Object.class, Localization.localize("side.objects"), width);
-        attributeTab = new Tab(Attribute.class, Localization.localize("side.attributes"), width);
-        questionTab = new Tab(Question.class, Localization.localize("side.questions"), width);
+        objectTab = new Tab(Object.class, Localization.localize("side.objects"));
+        attributeTab = new Tab(Attribute.class, Localization.localize("side.attributes"));
+        questionTab = new Tab(Question.class, Localization.localize("side.questions"));
 
         getChildren().addAll(objectTab, attributeTab, questionTab);
     }

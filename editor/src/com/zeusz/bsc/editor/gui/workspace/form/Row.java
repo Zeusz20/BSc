@@ -1,6 +1,7 @@
 package com.zeusz.bsc.editor.gui.workspace.form;
 
 import com.zeusz.bsc.core.Item;
+import com.zeusz.bsc.editor.gui.Style;
 
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -18,7 +19,7 @@ public class Row extends HBox {
     private Item item;  // can store Item on FXParent
 
     public Row(Node... children) {
-        setSpacing(8.0);
+        setSpacing(Style.SPACING_MEDIUM);
         init(children);
     }
 

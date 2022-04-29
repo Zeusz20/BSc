@@ -2,9 +2,9 @@ package com.zeusz.bsc.editor.validation;
 
 import com.zeusz.bsc.core.GWObject;
 import com.zeusz.bsc.editor.gui.FastTooltip;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 
@@ -15,9 +15,9 @@ public class ValidationIcon extends Button {
 
     public ValidationIcon(GWObject object) {
         this.object = object;
-        setStyle("-fx-background-color: transparent");
-        setPadding(new Insets(0.0));
-        setPrefSize(24.0, 24.0);
+        setStyle(Style.BG_TRANSPARENT);
+        setPadding(Style.PADDING_NONE);
+        setPrefSize(Style.ICON_SIZE, Style.ICON_SIZE);
         setFocusTraversable(false);
         validateObject();
     }

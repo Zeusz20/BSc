@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    .btn {
+        padding: 6px 12px;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    #refresh { background-color: #007bff; }
+    #refresh:active { background-color: #0069d9; }
+</style>
+</head>
+<body>
+<center>
+    <img src="file:sad.png" alt="404">
+    <p id="message" style="font-family: 'Courier New'"></p>
+    <button id="refresh" onclick="browser.draw()" class="btn"></button>
+</center>
+</body>
+</html>

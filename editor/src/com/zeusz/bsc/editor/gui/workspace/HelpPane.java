@@ -5,14 +5,13 @@ import com.zeusz.bsc.core.Item;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.gui.Scrollable;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.window.InfoWindow;
 import com.zeusz.bsc.editor.localization.Language;
 import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
-import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.Scanner;
@@ -45,8 +44,8 @@ public final class HelpPane extends VBox {
 
     /* Class methods and fields */
     private HelpPane(Class<? extends Item> type) {
-        setPadding(new Insets(10.0));
-        setStyle("-fx-background-color: white");
+        setPadding(Style.PADDING_MEDIUM);
+        setStyle(Style.BG_WHITE);
 
         String path = new StringBuilder()
                 .append("locale/help/")
@@ -64,13 +63,13 @@ public final class HelpPane extends VBox {
             while(scanner.hasNextLine())
                 content.append(scanner.nextLine()).append(" ");
 
-            title.setFont(Font.font(22.0));
+            title.setFont(Style.FONT_LARGE);
             description.setText(content.toString());
-            description.setFont(Font.font(16.0));
-            description.setWrappingWidth(256.0);
+            description.setFont(Style.FONT_SMALL);
+            description.setWrappingWidth(Style.SIDE_BAR_WIDTH);
 
             getChildren().addAll(title, description);
-            setSpacing(10.0);
+            setSpacing(Style.SPACING_LARGE);
         }
         catch(Exception e) {    // file could be null
             new InfoWindow(Localization.localize("error.help")).show();

@@ -2,6 +2,7 @@ package com.zeusz.bsc.editor.gui.explorer;
 
 import com.zeusz.bsc.core.Item;
 import com.zeusz.bsc.editor.Editor;
+import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.workspace.Workspace;
 import com.zeusz.bsc.editor.gui.IconButton;
 
@@ -15,8 +16,8 @@ public class ItemLabel extends BorderPane {
         Hyperlink link = new Hyperlink(item.getName());
         IconButton deleteBtn = new IconButton("img/del.png");
 
-        link.setMaxWidth(150.0);
-        link.setPrefWidth(150.0);
+        link.setMaxWidth(Style.LABEL_SIZE);
+        link.setPrefWidth(Style.LABEL_SIZE);
         link.getStylesheets().add("css/itemlabel.css");
         link.setOnMouseEntered(event -> setBorderColor("turquoise"));
         link.setOnMouseExited(event -> setBorderColor("transparent"));

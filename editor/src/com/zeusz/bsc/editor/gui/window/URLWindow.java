@@ -15,7 +15,7 @@ public class URLWindow extends Modal {
 
     public URLWindow() {
         url = new TextField();
-        init(Modal.SMALL);
+        init(Size.SMALL);
 
         url.requestFocus();
     }

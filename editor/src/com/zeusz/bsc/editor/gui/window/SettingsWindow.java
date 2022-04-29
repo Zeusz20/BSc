@@ -31,7 +31,7 @@ public class SettingsWindow extends Modal {
         });
 
         setTitle(Localization.localize("menu.settings"));
-        init(Modal.MEDIUM);
+        init(Size.MEDIUM);
 
         author.requestFocus();
     }

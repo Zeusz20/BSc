@@ -26,18 +26,18 @@ import java.net.URL;
 public final class Browser extends Modal implements Drawable {
 
     private WebView view;
-    private boolean timeout;
+    private boolean e404;
 
     public Browser() {
         setTitle(Localization.localize("browser.title"));
-        init(Modal.LARGE);
+        init(Size.LARGE);
 
         view = new WebView();
         view.setPrefWidth(this.getWidth());
         view.setPrefHeight(this.getHeight());
         view.setContextMenuEnabled(false);
 
-        // on timeout
+        // on 404
         view.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
             onTimeout(newValue);
         });
@@ -88,17 +88,20 @@ public final class Browser extends Modal implements Drawable {
     private void onTimeout(Worker.State state) {
         if(state == Worker.State.FAILED) {
             Platform.runLater(() -> {
-                timeout = true;
-                URL resource = ResourceLoader.getResource("browser/timeout.html");
+                e404 = true;
+                URL resource = ResourceLoader.getResource("browser/404.html");
                 if(resource != null)
                     view.getEngine().load(resource.toExternalForm());
             });
         }
-        else if(state == Worker.State.SUCCEEDED && timeout) {
-            Element paragraph = view.getEngine().getDocument().getElementById("message");
-            String localized = paragraph.getTextContent().replace("$timeout", Localization.localize("browser.timeout"));
-            paragraph.setTextContent(localized);
-            timeout = false;
+        else if(state == Worker.State.SUCCEEDED && e404) {
+            Element message = view.getEngine().getDocument().getElementById("message");
+            message.setTextContent(Localization.localize("browser.e404"));
+
+            Element refresh = view.getEngine().getDocument().getElementById("refresh");
+            refresh.setTextContent(Localization.localize("browser.refresh"));
+
+            e404 = false;
         }
     }
 
