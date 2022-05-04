@@ -1,6 +1,6 @@
 package com.zeusz.bsc.editor.gui.window;
 
-import com.zeusz.bsc.core.GWObject;
+import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.io.IOManager;
 import com.zeusz.bsc.editor.localization.Localization;
@@ -16,11 +16,10 @@ import netscape.javascript.JSObject;
 
 import org.w3c.dom.Element;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 
 public final class Browser extends Modal implements Drawable {
@@ -56,7 +55,7 @@ public final class Browser extends Modal implements Drawable {
 
     @Override
     public void draw() {
-        String url = GWObject.CLOUD_URL + "/user/?lang=" + Localization.getLanguage().getTag();
+        String url = Cloud.getCloudUrl("/user/?lang=" + Localization.getLanguage().getTag());
         view.getEngine().load(url);
         setScene(new Scene(view));
     }
@@ -89,12 +88,21 @@ public final class Browser extends Modal implements Drawable {
         if(state == Worker.State.FAILED) {
             Platform.runLater(() -> {
                 e404 = true;
-                URL resource = ResourceLoader.getResource("browser/404.html");
-                if(resource != null)
-                    view.getEngine().load(resource.toExternalForm());
+
+                // load 404 html page
+                try(InputStream file = ResourceLoader.getFile("browser/404.html");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(file, StandardCharsets.UTF_8))) {
+
+                    String content = reader.lines().collect(Collectors.joining("\n"));
+                    view.getEngine().loadContent(content);
+                }
+                catch(IOException e) {
+                    // couldn't read html file
+                }
             });
         }
         else if(state == Worker.State.SUCCEEDED && e404) {
+            // successfully loaded 404 page
             Element message = view.getEngine().getDocument().getElementById("message");
             message.setTextContent(Localization.localize("browser.e404"));
 

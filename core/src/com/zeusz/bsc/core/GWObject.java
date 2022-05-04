@@ -13,8 +13,6 @@ public abstract class GWObject implements Serializable {
 
     private static final long serialVersionUID = 1013286201L;
 
-    public static final transient String CLOUD_URL = "http://localhost:8000";
-
     public final byte[] hash() {
         try(ByteArrayOutputStream blob = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(blob)) {

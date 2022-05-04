@@ -1,10 +1,11 @@
 package com.zeusz.bsc.core;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
 
-public final class Pair<K, V> extends GWObject implements Map.Entry<K, V> {
+public final class Pair<K, V> implements Map.Entry<K, V>, Serializable {
 
     private static final long serialVersionUID = 3287917777L;
 

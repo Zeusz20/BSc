@@ -1,29 +1,26 @@
 package com.zeusz.bsc.editor.localization;
 
-import com.zeusz.bsc.editor.io.IOManager;
-
-import org.ini4j.Ini;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 
 final class LangConfig {
 
-    private Ini config;
+    private File file;
+    private Properties config;
 
     LangConfig() {
-        try {
-            // load/create user's config
-            File file = new File(IOManager.getInstance().getHomeDir(), "config.ini");
+        file = new File("config.properties");
+        config = new Properties();
 
-            if(!file.exists() && file.createNewFile()) {
-                config = new Ini(file);  // load ini after creating file
+        try {
+            if(!file.exists() && file.createNewFile())
                 setLanguage(Language.getLanguageByTag("en"));
-            }
-            else {
-                config = new Ini(file);  // file already exists
-            }
+
+            config.load(new FileInputStream(file));
         }
         catch(IOException e) {
             // couldn't read config
@@ -32,9 +29,9 @@ final class LangConfig {
 
     void setLanguage(Language language) {
         try {
-            if(config != null) {
-                config.put("editor", "lang", language.getTag());
-                config.store();
+            if(language != null) {
+                config.put("lang", language.getTag());
+                config.store(new FileOutputStream(file), null);
             }
         }
         catch(IOException e) {
@@ -43,7 +40,7 @@ final class LangConfig {
     }
 
     Language getLanguage() {
-        String tag = (config != null) ? config.get("editor", "lang") : null;
+        String tag = (String) config.get("lang");
         return Language.getLanguageByTag(tag);
     }
 

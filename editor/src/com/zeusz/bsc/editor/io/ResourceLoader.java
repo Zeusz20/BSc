@@ -2,29 +2,23 @@ package com.zeusz.bsc.editor.io;
 
 import javafx.scene.image.Image;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 
 
 public final class ResourceLoader {
 
     private ResourceLoader() { }
 
-    public static URL getResource(String path) {
-        return (path != null) ? ResourceLoader.class.getClassLoader().getResource(path) : null;
-    }
-
-    public static File getFile(String path) {
+    public static InputStream getFile(String path) {
         if(path == null) return null;
 
         try {
-            URL resource = getResource(path);
-            return (resource != null) ? new File(resource.toURI()) : new File(path);
+            InputStream resource = ResourceLoader.class.getClassLoader().getResourceAsStream(path);
+            return (resource == null) ? new FileInputStream(path) : resource;
         }
-        catch(URISyntaxException e) {
+        catch(IOException e) {
             return null;
         }
     }
@@ -32,13 +26,8 @@ public final class ResourceLoader {
     public static Image getFXImage(String path) {
         if(path == null) return null;
 
-        try {
-            File file = ResourceLoader.getFile(path);
-            if(file != null) return new Image(new FileInputStream(file));
-        }
-        catch(IOException e) {
-            // couldn't read file
-        }
+        InputStream file = ResourceLoader.getFile(path);
+        if(file != null) return new Image(file);
 
         return null;
     }

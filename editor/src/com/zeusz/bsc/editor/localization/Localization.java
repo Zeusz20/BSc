@@ -2,9 +2,8 @@ package com.zeusz.bsc.editor.localization;
 
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -26,11 +25,10 @@ public final class Localization {
     public static Language getLanguage() { return config.getLanguage(); }
 
     public static void load(Language language) {
-        File file = ResourceLoader.getFile("locale/lang/" + language.getTag() + ".properties");
+        try(InputStream file = ResourceLoader.getFile("locale/lang/" + language.getTag() + ".properties");
+            InputStreamReader reader = new InputStreamReader(file, StandardCharsets.UTF_8)) {
 
-        try(InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
-            // populate localization map
-            localization.load(reader);
+            localization.load(reader);  // populate localization map
         }
         catch(IOException e) {
             // couldn't read properties file

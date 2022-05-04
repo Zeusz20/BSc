@@ -17,7 +17,7 @@ public final class IOManager {
     public static IOManager getInstance() { return INSTANCE; }
 
     /* Class methods and fields */
-    private File home, config, images;
+    private File home, images;
     private FileChooser dialog;
     private ExtensionFilter gwpFilter, imageFilter;
 
@@ -27,9 +27,7 @@ public final class IOManager {
         imageFilter = new ExtensionFilter("Image (*.png), (*.jpg), (*.jpeg)", "*.png", "*.jpg", "*.jpeg");
 
         // init home directory
-        home = new File(System.getProperty("user.home"), "GWEditor");
-        if(!home.exists() && !home.mkdir())
-            home = new File(System.getProperty("user.home"));
+        home = new File(IOManager.class.getProtectionDomain().getCodeSource().getLocation().getFile()); // jar's location
         setImagesDir(home);
 
         // init file chooser
@@ -93,7 +91,5 @@ public final class IOManager {
         dialog.setInitialDirectory(forImages ? images : home);
         return dialog;
     }
-
-    public File getHomeDir() { return home; }
 
 }

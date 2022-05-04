@@ -2,9 +2,8 @@ package com.zeusz.bsc.editor.localization;
 
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -17,11 +16,12 @@ public final class Language implements Comparable<Language> {
     private static Language[] languages;
 
     static {
-        try {
+        try(InputStream file = ResourceLoader.getFile("config/language.properties");
+            InputStreamReader reader = new InputStreamReader(file, StandardCharsets.UTF_8)) {
+
             // load available languages
-            File file = ResourceLoader.getFile("config/language.properties");
             Properties config = new Properties();
-            config.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+            config.load(reader);
 
             languages = new Language[config.keySet().size()];
 

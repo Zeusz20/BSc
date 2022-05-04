@@ -7,13 +7,15 @@ import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.gui.Scrollable;
 import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.window.InfoWindow;
+import com.zeusz.bsc.editor.io.ResourceLoader;
 import com.zeusz.bsc.editor.localization.Language;
 import com.zeusz.bsc.editor.localization.Localization;
-import com.zeusz.bsc.editor.io.ResourceLoader;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 
@@ -58,7 +60,9 @@ public final class HelpPane extends VBox {
         Text title = new Text(Localization.capLocalize("word." + type.getSimpleName().toLowerCase()));
         Text description = new Text();
 
-        try(Scanner scanner = new Scanner(ResourceLoader.getFile(path))) {
+        try(InputStreamReader reader = new InputStreamReader(ResourceLoader.getFile(path), StandardCharsets.UTF_8);
+            Scanner scanner = new Scanner(reader)) {
+
             StringBuilder content = new StringBuilder();
             while(scanner.hasNextLine())
                 content.append(scanner.nextLine()).append(" ");
