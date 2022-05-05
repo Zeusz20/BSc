@@ -1,0 +1,8 @@
+[object]
+Objektum leírás.
+
+[attribute]
+Tulajdonság leírás.
+
+[question]
+Kérdés leírás.

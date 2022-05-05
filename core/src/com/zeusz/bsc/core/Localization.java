@@ -50,10 +50,8 @@ public final class Localization {
     }
 
     public static void load(Locale locale) {
-        localization = ResourceBundle.getBundle("locale/lang/" + locale);
-
-        // avoid unnecessary writes
-        if(!isCurrent(locale)) store(locale);
+        localization = ResourceBundle.getBundle("locale/" + locale.getLanguage() + "/" + locale);
+        if(!isCurrent(locale)) store(locale);   // avoid unnecessary writes
     }
 
     public static void store(Locale locale) {

@@ -5,15 +5,13 @@ import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.editor.gui.Scrollable;
 import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.window.InfoWindow;
-import com.zeusz.bsc.editor.io.ResourceLoader;
+import com.zeusz.bsc.editor.io.HelpParser;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.Locale;
-import java.util.Scanner;
 
 
 public final class HelpPane extends VBox {
@@ -44,33 +42,21 @@ public final class HelpPane extends VBox {
         setPadding(Style.PADDING_MEDIUM);
         setStyle(Style.BG_WHITE);
 
-        String path = new StringBuilder()
-                .append("locale/help/")
-                .append(Localization.getLocale().getLanguage())
-                .append("_")
-                .append(type.getSimpleName().toLowerCase())
-                .append(".txt")
-                .toString();
+        try {
+            HelpParser parser = new HelpParser(locale);
+            String name = type.getSimpleName().toLowerCase();
 
-        Text title = new Text(Localization.capLocalize("word." + type.getSimpleName().toLowerCase()));
-        Text description = new Text();
-
-        try(InputStreamReader reader = new InputStreamReader(ResourceLoader.getFile(path), StandardCharsets.UTF_8);
-            Scanner scanner = new Scanner(reader)) {
-
-            StringBuilder content = new StringBuilder();
-            while(scanner.hasNextLine())
-                content.append(scanner.nextLine()).append(" ");
+            Text title = new Text(Localization.capLocalize("word." + name));
+            Text description = new Text(parser.getSection(name));
 
             title.setFont(Style.FONT_LARGE);
-            description.setText(content.toString());
             description.setFont(Style.FONT_SMALL);
             description.setWrappingWidth(Style.SIDE_BAR_WIDTH);
 
             getChildren().addAll(title, description);
             setSpacing(Style.SPACING_LARGE);
         }
-        catch(Exception e) {    // file could be null
+        catch(IOException e) {
             new InfoWindow(Localization.localize("error.help")).show();
         }
     }
