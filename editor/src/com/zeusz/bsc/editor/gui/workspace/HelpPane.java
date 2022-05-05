@@ -1,31 +1,28 @@
 package com.zeusz.bsc.editor.gui.workspace;
 
-import com.zeusz.bsc.core.Attribute;
-import com.zeusz.bsc.core.Item;
+import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.gui.Scrollable;
 import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.window.InfoWindow;
 import com.zeusz.bsc.editor.io.ResourceLoader;
-import com.zeusz.bsc.editor.localization.Language;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Scanner;
 
 
 public final class HelpPane extends VBox {
 
-    private static Language language;
+    private static Locale locale;
     private static HelpPane objectHelpPane, attributeHelpPane, questionHelpPane;
 
     public static void init() {
-        language = Localization.getLanguage();
+        locale = Localization.getLocale();
         objectHelpPane = new HelpPane(Object.class);
         attributeHelpPane = new HelpPane(Attribute.class);
         questionHelpPane = new HelpPane(Question.class);
@@ -33,10 +30,8 @@ public final class HelpPane extends VBox {
 
     /* HelpPane factory */
     public static Scrollable getHelpFor(Class<? extends Item> type) {
-        boolean isUninitialized = (objectHelpPane == null || attributeHelpPane == null || questionHelpPane == null);
-        boolean languageChanged = (language != Localization.getLanguage());
-
-        if(isUninitialized || languageChanged) init();
+        if(objectHelpPane == null || attributeHelpPane == null || questionHelpPane == null || !Localization.isCurrent(locale))
+            init();
 
         if(type == Object.class) return new Scrollable(objectHelpPane);
         if(type == Attribute.class) return new Scrollable(attributeHelpPane);
@@ -51,7 +46,7 @@ public final class HelpPane extends VBox {
 
         String path = new StringBuilder()
                 .append("locale/help/")
-                .append(Localization.getLanguage().getTag())
+                .append(Localization.getLocale().getLanguage())
                 .append("_")
                 .append(type.getSimpleName().toLowerCase())
                 .append(".txt")

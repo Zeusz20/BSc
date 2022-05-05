@@ -1,8 +1,8 @@
 package com.zeusz.bsc.editor.gui.window;
 
 import com.zeusz.bsc.core.Attribute;
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.Editor;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;

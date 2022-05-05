@@ -1,9 +1,9 @@
 package com.zeusz.bsc.editor.gui.window;
 
 import com.zeusz.bsc.core.Cloud;
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.io.IOManager;
-import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
 import javafx.application.Platform;
@@ -55,7 +55,7 @@ public final class Browser extends Modal implements Drawable {
 
     @Override
     public void draw() {
-        String url = Cloud.getCloudUrl("/user/?lang=" + Localization.getLanguage().getTag());
+        String url = Cloud.getCloudUrl("/user/?lang=" + Localization.getLocale().getLanguage());
         view.getEngine().load(url);
         setScene(new Scene(view));
     }

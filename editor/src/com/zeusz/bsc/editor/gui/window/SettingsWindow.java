@@ -1,10 +1,10 @@
 package com.zeusz.bsc.editor.gui.window;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 import com.zeusz.bsc.editor.gui.Box;
 import com.zeusz.bsc.editor.gui.Prompt;
 import com.zeusz.bsc.editor.gui.workspace.form.Row;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;

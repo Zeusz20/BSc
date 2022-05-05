@@ -1,6 +1,7 @@
 package com.zeusz.bsc.editor.gui.workspace;
 
 import com.zeusz.bsc.core.Attribute;
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Pair;
 import com.zeusz.bsc.editor.gui.Box;
@@ -9,7 +10,6 @@ import com.zeusz.bsc.editor.gui.Style;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
 import com.zeusz.bsc.editor.gui.window.AttributeWindow;
 import com.zeusz.bsc.editor.gui.window.Modal;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;

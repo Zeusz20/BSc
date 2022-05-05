@@ -12,7 +12,6 @@ import com.zeusz.bsc.editor.gui.workspace.Workspace;
 import com.zeusz.bsc.editor.gui.menu.NavigationBar;
 import com.zeusz.bsc.editor.gui.explorer.SideMenu;
 import com.zeusz.bsc.editor.io.FXImageCache;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;

@@ -1,9 +1,9 @@
 package com.zeusz.bsc.editor.gui.window;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.Editor;
 import com.zeusz.bsc.editor.gui.FixedButton;
 import com.zeusz.bsc.editor.gui.Style;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;

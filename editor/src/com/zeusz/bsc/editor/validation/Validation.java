@@ -2,7 +2,6 @@ package com.zeusz.bsc.editor.validation;
 
 import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import java.util.List;
 import java.util.Set;

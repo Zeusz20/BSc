@@ -7,7 +7,6 @@ import com.zeusz.bsc.editor.gui.explorer.SideMenu;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
 import com.zeusz.bsc.editor.validation.ValidationHint;
 import com.zeusz.bsc.editor.validation.ValidationIcon;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;

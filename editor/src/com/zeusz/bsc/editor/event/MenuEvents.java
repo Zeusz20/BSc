@@ -1,15 +1,12 @@
 package com.zeusz.bsc.editor.event;
 
-import com.zeusz.bsc.core.Attribute;
+import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.core.Project;
-import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.Editor;
 import com.zeusz.bsc.editor.gui.window.Browser;
 import com.zeusz.bsc.editor.gui.window.InfoWindow;
 import com.zeusz.bsc.editor.gui.window.SettingsWindow;
 import com.zeusz.bsc.editor.io.IOManager;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

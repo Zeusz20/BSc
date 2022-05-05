@@ -1,12 +1,13 @@
 package com.zeusz.bsc.editor.gui.menu;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.Editor;
 import com.zeusz.bsc.editor.gui.workspace.HelpPane;
-import com.zeusz.bsc.editor.localization.Language;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+
+import java.util.Locale;
 
 
 public class LangMenuItem extends RadioMenuItem {
@@ -18,22 +19,26 @@ public class LangMenuItem extends RadioMenuItem {
         LANG_GROUP.selectedToggleProperty().addListener(((observable, oldValue, newValue) -> HelpPane.init()));
     }
 
-    private Language language;
+    private Locale locale;
 
-    public LangMenuItem(Language language) {
-        this.language = language;
+    public LangMenuItem(Locale locale) {
+        this.locale = locale;
+
+        // some language names are not capitalized
+        String language = locale.getDisplayLanguage(locale);
+        language = language.substring(0, 1).toUpperCase(locale) + language.substring(1);
 
         String text = new StringBuilder()
-                .append(language.getName())
+                .append(language)
                 .append(" (")
-                .append(language.getTag())
+                .append(locale.getLanguage())
                 .append(")")
                 .toString();
 
         setText(text);
         setToggleGroup(LANG_GROUP);
         setOnAction(event -> {
-            Localization.load(language);
+            Localization.load(this.locale);
 
             // redraw editor by reinitializing the same project
             // need to save old hash as well because Editor::initProject saves the current hash
@@ -45,6 +50,6 @@ public class LangMenuItem extends RadioMenuItem {
         });
     }
 
-    public Language getLanguage() { return language; }
+    public Locale getLocale() { return locale; }
 
 }

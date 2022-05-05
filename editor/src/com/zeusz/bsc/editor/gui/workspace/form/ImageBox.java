@@ -1,5 +1,6 @@
 package com.zeusz.bsc.editor.gui.workspace.form;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.editor.gui.Box;
 import com.zeusz.bsc.editor.gui.FixedButton;
@@ -9,7 +10,6 @@ import com.zeusz.bsc.editor.gui.window.Modal;
 import com.zeusz.bsc.editor.gui.window.URLWindow;
 import com.zeusz.bsc.editor.io.FXImageCache;
 import com.zeusz.bsc.editor.io.IOManager;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import java.io.File;
 import java.net.URL;

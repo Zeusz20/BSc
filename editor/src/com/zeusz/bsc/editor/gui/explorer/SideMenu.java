@@ -1,12 +1,9 @@
 package com.zeusz.bsc.editor.gui.explorer;
 
-import com.zeusz.bsc.core.Attribute;
-import com.zeusz.bsc.core.Item;
+import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.gui.Style;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;

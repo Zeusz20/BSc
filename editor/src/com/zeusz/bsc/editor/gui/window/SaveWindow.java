@@ -1,6 +1,6 @@
 package com.zeusz.bsc.editor.gui.window;
 
-import com.zeusz.bsc.editor.localization.Localization;
+import com.zeusz.bsc.core.Localization;
 
 
 public class SaveWindow extends Modal {

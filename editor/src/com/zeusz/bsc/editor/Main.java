@@ -1,8 +1,8 @@
 package com.zeusz.bsc.editor;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.event.SaveWarningEvent;
 import com.zeusz.bsc.editor.gui.window.SettingsWindow;
-import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
 import javafx.application.Application;
@@ -22,6 +22,8 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Localization.init();
+
         // set icon and title
         primaryStage.getIcons().add(ResourceLoader.getFXImage("img/icon.png"));
         primaryStage.setTitle(Localization.localize("window.title"));

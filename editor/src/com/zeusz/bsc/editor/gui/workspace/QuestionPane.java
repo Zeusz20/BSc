@@ -1,13 +1,13 @@
 package com.zeusz.bsc.editor.gui.workspace;
 
 import com.zeusz.bsc.core.Attribute;
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Question;
 import com.zeusz.bsc.editor.Editor;
 import com.zeusz.bsc.editor.gui.Box;
 import com.zeusz.bsc.editor.gui.IconButton;
 import com.zeusz.bsc.editor.gui.Prompt;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
-import com.zeusz.bsc.editor.localization.Localization;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;

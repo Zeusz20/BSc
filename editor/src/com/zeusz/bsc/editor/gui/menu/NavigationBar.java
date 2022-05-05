@@ -1,12 +1,11 @@
 package com.zeusz.bsc.editor.gui.menu;
 
 import com.zeusz.bsc.core.GWObject;
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 import com.zeusz.bsc.editor.gui.Drawable;
 import com.zeusz.bsc.editor.gui.IconButton;
 import com.zeusz.bsc.editor.gui.workspace.form.Row;
-import com.zeusz.bsc.editor.localization.Language;
-import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 import com.zeusz.bsc.editor.validation.ValidationHint;
 import com.zeusz.bsc.editor.validation.ValidationIcon;
@@ -17,6 +16,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import org.ini4j.Ini;
+
+import java.util.Locale;
+import java.util.Objects;
 
 
 public class NavigationBar extends BorderPane implements Drawable, ValidationHint {
@@ -85,9 +87,9 @@ public class NavigationBar extends BorderPane implements Drawable, ValidationHin
 
             // dynamically generate language menu
             Menu langMenu = new Menu(Localization.localize("menu.language"));
-            for(Language language: Language.values()) {
-                LangMenuItem menuItem = new LangMenuItem(language);
-                menuItem.setSelected(menuItem.getLanguage() == Localization.getLanguage());
+            for(Locale locale: Localization.getSupportedLocales()) {
+                LangMenuItem menuItem = new LangMenuItem(locale);
+                menuItem.setSelected(Localization.isCurrent(menuItem.getLocale()));
                 langMenu.getItems().add(menuItem);
             }
             menuBar.getMenus().add(langMenu);

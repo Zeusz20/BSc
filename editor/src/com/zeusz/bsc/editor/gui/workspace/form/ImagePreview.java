@@ -1,8 +1,8 @@
 package com.zeusz.bsc.editor.gui.workspace.form;
 
+import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.editor.gui.FastTooltip;
 import com.zeusz.bsc.editor.io.IOManager;
-import com.zeusz.bsc.editor.localization.Localization;
 import com.zeusz.bsc.editor.io.ResourceLoader;
 
 import javafx.beans.Observable;
