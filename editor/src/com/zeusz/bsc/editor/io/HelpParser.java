@@ -14,7 +14,7 @@ public final class HelpParser {
     private String path;
 
     public HelpParser(Locale locale) throws IOException {
-        path = String.format("locale/%s/help.txt", locale.getLanguage());
+        path = String.format("locale/%s/help.txt", locale.toString());
     }
 
     public String getSection(String section) {
@@ -33,13 +33,12 @@ public final class HelpParser {
                 }
 
                 if(read)
-                    content.append(line);
+                    content.append(line).append('\n');
             }
 
             return content.toString();
         }
         catch(IOException e) {
-            e.printStackTrace();
             return "";
         }
     }

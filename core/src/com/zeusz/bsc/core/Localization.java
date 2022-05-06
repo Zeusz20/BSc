@@ -1,64 +1,75 @@
 package com.zeusz.bsc.core;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
+/** This implementation DOES NOT SUPPORT locale variants. */
 public final class Localization {
 
     private Localization() { }
 
-    private static final Set<Locale> SUPPORTED_LOCALES = new LinkedHashSet<>(Arrays.asList(
-            Locale.forLanguageTag("en"),
-            Locale.forLanguageTag("hu")/*,
-            Locale.forLanguageTag("sk")*/
-    ));
-
-    private static final String CONFIG_PATH = "lang.properties";
-    private static final String LOCALE = Locale.class.getSimpleName().toLowerCase();
+    private static final String CONFIG_PATH = "config.properties";
+    private static final String LOCALE = "locale";
 
     private static Locale locale;
     private static ResourceBundle localization;    // contains (unlocalized -> localized) pairs
 
-    public static Set<Locale> getSupportedLocales() { return SUPPORTED_LOCALES; }
+    /** @return All locales in the app's res/locale folder. */
+    public static Set<Locale> getSupportedLocales() {
+        Set<Locale> supportedLocales = new LinkedHashSet<>();
 
-    public static Locale getLocale() { return locale; }
+        try(InputStream directory = Localization.class.getClassLoader().getResourceAsStream(LOCALE)) {
+            if(directory != null) {
+                byte[] contents = new byte[directory.available()];
+                directory.read(contents);   // this ignores empty folders
+
+                // get directory names
+                String[] locales = new String(contents).split("\n");
+                Arrays.stream(locales).forEach(it -> supportedLocales.add(parseLocale(it)));
+            }
+        }
+        catch(IOException e) {
+            // couldn't read dir
+        }
+
+        return supportedLocales;
+    }
 
     public static void init() {
         try {
             Properties properties = new Properties();
             properties.load(new FileInputStream(CONFIG_PATH));
-            locale = Locale.forLanguageTag(properties.getProperty(LOCALE));
+            locale = parseLocale(properties.getProperty(LOCALE));
 
             // check if loaded locale is supported
-            Optional<Locale> supported = getSupportedLocales().stream().filter(it -> {
-                return Objects.equals(it.getLanguage(), locale.getLanguage());
-            }).findAny();
+            Optional<Locale> supported = getSupportedLocales().stream().filter(Localization::isCurrent).findAny();
 
             if(!supported.isPresent()) {
-                System.err.println(String.format("Locale %s is not supported", locale.getLanguage()));
+                System.err.printf("Locale %s is not supported!%n", locale.toString());
                 throw new IOException();
             }
         }
         catch(IOException e) {
-            locale = Locale.ENGLISH;
+            locale = Locale.US;
         }
 
         load(locale);
     }
 
     public static void load(Locale locale) {
-        localization = ResourceBundle.getBundle("locale/" + locale.getLanguage() + "/" + locale);
-        if(!isCurrent(locale)) store(locale);   // avoid unnecessary writes
+        localization = ResourceBundle.getBundle("locale/" + locale.toString() + "/lang");
+
+        // avoid unnecessary writes
+        if(!getLocale().equals(locale))
+            store(locale);
     }
 
     public static void store(Locale locale) {
         try {
             Localization.locale = locale;
             Properties properties = new Properties();
-            properties.put(LOCALE, locale.getLanguage());
+            properties.put(LOCALE, locale.toString());
             properties.store(new FileOutputStream(CONFIG_PATH), null);
         }
         catch(IOException e) {
@@ -66,9 +77,16 @@ public final class Localization {
         }
     }
 
-    public static boolean isCurrent(Locale locale) {
-        return Objects.equals(locale.getLanguage(), getLocale().getLanguage());
+    public static Locale parseLocale(String s) {
+        String[] split = s.split("_");
+        return new Locale(split[0], split[1]);
     }
+
+    public static boolean isCurrent(Locale locale) {
+        return getLocale().equals(locale);
+    }
+
+    public static Locale getLocale() { return locale; }
 
     /** @return Localized version of the unlocalized string. */
     public static String localize(String unlocalized) {
