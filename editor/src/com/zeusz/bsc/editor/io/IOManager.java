@@ -27,7 +27,8 @@ public final class IOManager {
         imageFilter = new ExtensionFilter("Image (*.png), (*.jpg), (*.jpeg)", "*.png", "*.jpg", "*.jpeg");
 
         // init home directory
-        home = new File(IOManager.class.getProtectionDomain().getCodeSource().getLocation().getFile()); // jar's location
+        String path = IOManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        home = new File(path).getParentFile(); // jar's location
         setImagesDir(home);
 
         // init file chooser
