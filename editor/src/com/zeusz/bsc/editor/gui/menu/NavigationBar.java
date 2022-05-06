@@ -18,7 +18,6 @@ import javafx.scene.layout.BorderPane;
 import org.ini4j.Ini;
 
 import java.util.Locale;
-import java.util.Objects;
 
 
 public class NavigationBar extends BorderPane implements Drawable, ValidationHint {

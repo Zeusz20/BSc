@@ -2,6 +2,7 @@ package com.zeusz.bsc.core;
 
 import java.io.*;
 import java.util.*;
+import java.util.jar.JarFile;
 
 
 /** This implementation DOES NOT SUPPORT locale variants. */
@@ -12,14 +13,25 @@ public final class Localization {
     private static final String CONFIG_PATH = "config.properties";
     private static final String LOCALE = "locale";
 
+    private static Class<?> application;    // which application uses localization
+    private static Set<Locale> supportedLocales;
     private static Locale locale;
     private static ResourceBundle localization;    // contains (unlocalized -> localized) pairs
 
-    /** @return All locales in the app's res/locale folder. */
-    public static Set<Locale> getSupportedLocales() {
-        Set<Locale> supportedLocales = new LinkedHashSet<>();
+    /** Iterate over JAR's entries to find app's supported locales. */
+    private static void iterateJar(String path) {
+        try(JarFile jar = new JarFile(path)) {
+            jar.stream().filter(it -> it.isDirectory() && it.getName().startsWith(LOCALE) && it.getName().contains("_"))
+                    .forEach(it -> supportedLocales.add(parseLocale(new File(it.getName()).getName())));
+        }
+        catch(IOException e) {
+            // couldn't read jar
+        }
+    }
 
-        try(InputStream directory = Localization.class.getClassLoader().getResourceAsStream(LOCALE)) {
+    /** Iterate over a directory's entries to find app's supported locales. */
+    private static void iterateDir() {
+        try(InputStream directory = application.getClassLoader().getResourceAsStream(LOCALE)) {
             if(directory != null) {
                 byte[] contents = new byte[directory.available()];
                 directory.read(contents);   // this ignores empty folders
@@ -30,14 +42,32 @@ public final class Localization {
             }
         }
         catch(IOException e) {
-            // couldn't read dir
+            // couldn't read directory
+        }
+    }
+
+    /** @return All locales in the app's res/locale folder. */
+    public static Set<Locale> getSupportedLocales() {
+        if(supportedLocales == null) {
+            supportedLocales = new LinkedHashSet<>();
+
+            // different iteration is needed for jars (prod) and directories (dev)
+            String path = application.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+            if(path.endsWith(".jar"))
+                iterateJar(path);
+            else
+                iterateDir();
         }
 
         return supportedLocales;
     }
 
-    public static void init() {
+    public static void init(Class<?> application) {
         try {
+            Localization.application = application;
+
+            // load locale from config
             Properties properties = new Properties();
             properties.load(new FileInputStream(CONFIG_PATH));
             locale = parseLocale(properties.getProperty(LOCALE));
@@ -59,10 +89,7 @@ public final class Localization {
 
     public static void load(Locale locale) {
         localization = ResourceBundle.getBundle("locale/" + locale.toString() + "/lang");
-
-        // avoid unnecessary writes
-        if(!getLocale().equals(locale))
-            store(locale);
+        if(!Localization.isCurrent(locale)) store(locale);  // avoid unnecessary writes
     }
 
     public static void store(Locale locale) {
@@ -103,6 +130,5 @@ public final class Localization {
     public static String prompt(String unlocalized) {
         return capLocalize(unlocalized) + ": ";
     }
-
 
 }
