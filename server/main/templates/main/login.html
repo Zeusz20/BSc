@@ -2,14 +2,18 @@
 
 {% block content %}
 <div class="row">
-    <div class="col">
+    <div class="col d-flex justify-content-start">
         <p class="lead">
             <span lang="en">Don't have a Cloud account? <br> Click <a href="/user/register/">HERE</a> to create one.</span>
             <span lang="hu">Még nincs Felhő fiókja? <br> Kattintson <a href="/user/register/">IDE</a> a regisztrációhoz.</span>
         </p>
     </div>
+
     <div class="col d-flex justify-content-end">
-        {% include 'main/google_login.html' %}
+        <a href="/user/search/" class="lead link-primary" style="margin: auto 0 auto 0">
+            <span lang="en">Browse Projects</span>
+            <span lang="hu">Projektek Böngészése</span>
+        </a>
     </div>
 </div>
 
@@ -32,11 +36,18 @@
             <span lang="hu"><a href="/user/recovery/" class="lead">Elfelejtette a jelszavát?</a></span>
         </div>
     </div>
+
     <div class="col d-flex justify-content-end">
         <button type="submit" form="login" class="btn btn-secondary">
             <span lang="en">Sing In</span>
             <span lang="hu">Bejelentkezés</span>
         </button>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center my-4">
+    <div class="shadow" style="border-radius: 32px">
+        {% include 'main/google_login.html' %}
     </div>
 </div>
 {% endblock content %}

@@ -127,11 +127,11 @@ class UserView(View):
             from django.core.paginator import Paginator
             from django.db.models import Q
 
-            if not authenticated:
-                return redirect('/user/login/')
-
-            db_param = Q(user=request.user) if self.view == 'home' else ~Q(user=request.user)
-            projects = GWProject.objects.filter(db_param)
+            if authenticated:
+                db_param = Q(user=request.user) if self.view == 'home' else ~Q(user=request.user)
+                projects = GWProject.objects.filter(db_param)
+            else:
+                projects = GWProject.objects.all()
 
             query = request.GET.get('query')
             page = request.GET.get('page', '1')

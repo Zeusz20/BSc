@@ -1,5 +1,5 @@
 {% load socialaccount %}
-<form method="post" action="{% provider_login_url 'google' %}">
+<form method="post" action="{% provider_login_url 'google' %}" class="m-0 p-0">
     {% csrf_token %}
     <button type="submit" class="btn btn-outline-light" style="color: black; border-color: #6c757d; border-radius: 32px">
         {% load static %}
