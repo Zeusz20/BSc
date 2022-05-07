@@ -1,0 +1,12 @@
+{% load socialaccount %}
+<form method="post" action="{% provider_login_url 'google' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-light" style="color: black; border-color: #6c757d; border-radius: 32px">
+        {% load static %}
+        <img src="{% static 'main/img/google.png' %}" alt="google" style="max-width: 24px">
+        <small class="text-muted">
+            <span lang="en">Log in with Google</span>
+            <span lang="hu">Belépés Google fiókkal</span>
+        </small>
+    </button>
+</form>
