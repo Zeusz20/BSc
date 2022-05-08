@@ -1,0 +1,15 @@
+.button {
+    -fx-padding: 6px 12px;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-radius: 4px;
+    -fx-cursor: hand;
+}
+
+#reload {
+    -fx-background-color: #007bff;
+}
+
+#reload:active {
+    -fx-background-color: #0069d9;
+}

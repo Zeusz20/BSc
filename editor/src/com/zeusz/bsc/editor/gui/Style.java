@@ -37,6 +37,7 @@ public final class Style {
     public static final Font FONT_MEDIUM = Font.font(18.0);
     public static final Font FONT_LARGE = Font.font(22.0);
     public static final Font FONT_UNSTYLED = Font.font(null, FontWeight.NORMAL, 18.0);
+    public static final Font FONT_MONOSPACED = Font.font("Courier New", 18.0);
 
     // Backgrounds
     public static final String BG_WHITE = "-fx-background-color: white";
