@@ -205,26 +205,34 @@ class UserView(View):
     def _recovery(self, request):
         email = request.POST.get('email', '').strip()
 
-        try:
-            from django.core.mail import send_mail
-            from uuid import uuid4
-            user = User.objects.get(email=email)
-            new_password = str(uuid4()).replace('-', '')
-            user.set_password(new_password)
-            user.save()
+        if email != '':
+            try:
+                from django.core.mail import send_mail
+                from uuid import uuid4
+                user = User.objects.get(email=email)
 
-            send_mail(
-                localize(request, RECOVERY_SUBJECT),
-                localize(request, RECOVERY_MESSAGE) % (user.username, new_password),
-                settings.EMAIL_HOST_USER,
-                [user.email]
-            )
+                # check if email is associated with a google account
+                if user.username in map(lambda it: it.username, User.objects.all()):
+                    messages.warning(request, localize(request, GOOGLE_ACCOUNT_ASSOCIATION))
+                    return redirect('/user/login/')
 
-            messages.success(request, localize(request, MAIL_SENT))
-            return redirect('/user/login/')
-        except User.DoesNotExist:
-            messages.error(request, localize(request, USER_DOES_NOT_EXIST))
-            return render(request, 'main/recovery.html')
+                # generate new password
+                new_password = str(uuid4()).replace('-', '')
+                user.set_password(new_password)
+                user.save()
+
+                send_mail(
+                    localize(request, RECOVERY_SUBJECT),
+                    localize(request, RECOVERY_MESSAGE) % (user.username, new_password),
+                    settings.EMAIL_HOST_USER,
+                    [user.email]
+                )
+
+                messages.success(request, localize(request, MAIL_SENT))
+                return redirect('/user/login/')
+            except User.DoesNotExist:
+                messages.error(request, localize(request, USER_DOES_NOT_EXIST))
+                return render(request, 'main/recovery.html')
 
     def _settings(self, request):
         email_change = request.POST.get('type') == 'email'

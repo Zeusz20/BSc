@@ -18,6 +18,7 @@ FILE_UPDATE = 13
 FILE_DELETE = 14
 FILE_EXISTS = 15
 INVALID_FILE = 16
+GOOGLE_ACCOUNT_ASSOCIATION = 17
 
 
 _MESSAGES = [
@@ -55,6 +56,9 @@ _MESSAGES = [
     ('Project already exists', 'A projekt már létezik'),
 
     ('Project is invalid', 'Érvénytelen projekt'),
+
+    ('This email is associated with a Google account. Try loggin in with Google!',
+     'Ez az email cím egy Google fiókhoz van kötve. Próbáljon belépni Google-n keresztül!'),
 ]
 
 
