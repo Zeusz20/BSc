@@ -7,7 +7,14 @@
                     {% load static %}
                     <img src="{% static 'main/img/account.png' %}" alt="account">
                 </td>
-                <td style="color: white">{{ request.user.username }}</td>
+                <td style="color: white">
+                    {% if request.user.first_name != '' %}
+                        {# Load Google account name #}
+                        {{ request.user.first_name }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
+                </td>
             </tr>
         </table>
     </div>

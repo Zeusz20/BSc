@@ -8,10 +8,9 @@
 <form method="post">
     {% csrf_token %}
     <input type="hidden" name="type" value="recovery">
-    <span lang="en">Username:</span>
-    <span lang="hu">Felhasználónév:</span>
+    E-mail:
     <div class="input-group">
-        <input type="text" name="username" class="form-control" required>
+        <input type="email" name="email" class="form-control" required>
         <div class="input-group-append">
             <button class="btn btn-secondary">
                 <span lang="en">Submit</span>

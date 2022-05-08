@@ -187,23 +187,28 @@ class UserView(View):
             messages.error(request, localize(request, WRONG_REGISTER_USERNAME))
             return redirect('/user/register/')
         except User.DoesNotExist:
-            if password1 != password2:
-                messages.error(request, localize(request, WRONG_REGISTER_PASSWORD))
+            try:
+                User.objects.get(email=email)
+                messages.error(request, localize(request, WRONG_REGISTER_EMAIL))
                 return redirect('/user/register/')
-            else:
-                user = User(username=username, email=email)
-                user.set_password(password1)
-                user.save()
-                messages.success(request, localize(request, SUCCESSFUL_REGISTRATION))
-                return redirect('/user/login/')
+            except User.DoesNotExist:
+                if password1 != password2:
+                    messages.error(request, localize(request, WRONG_REGISTER_PASSWORD))
+                    return redirect('/user/register/')
+                else:
+                    user = User(username=username, email=email)
+                    user.set_password(password1)
+                    user.save()
+                    messages.success(request, localize(request, SUCCESSFUL_REGISTRATION))
+                    return redirect('/user/login/')
 
     def _recovery(self, request):
-        username = request.POST.get('username')
+        email = request.POST.get('email', '').strip()
 
         try:
             from django.core.mail import send_mail
             from uuid import uuid4
-            user = User.objects.get(username=username)
+            user = User.objects.get(email=email)
             new_password = str(uuid4()).replace('-', '')
             user.set_password(new_password)
             user.save()
