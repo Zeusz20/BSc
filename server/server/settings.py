@@ -134,10 +134,10 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/projects/'
-MEDIA_ROOT = 'projects'
+MEDIA_ROOT = BASE_DIR / 'projects'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -42,15 +42,15 @@ public final class Browser extends Modal implements Drawable {
                 Platform.runLater(() -> getScene().setRoot(getErrorPage()));
         });
 
-        // trigger file downloader
+        // trigger file download
         view.getEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
-            downloadFile(newValue);
+            downloadFile(oldValue, newValue);
         });
 
         draw();
     }
 
-    private void downloadFile(String url) {
+    private void downloadFile(String previous, String url) {
         if(url.endsWith(".gwp")) {
             FileChooser chooser = IOManager.getInstance().getFileChooser(false);
             chooser.setInitialFileName(new File(url).getName());
@@ -70,6 +70,8 @@ public final class Browser extends Modal implements Drawable {
                     window.show();
                 }
             }
+
+            view.getEngine().load(previous);
         }
     }
 
