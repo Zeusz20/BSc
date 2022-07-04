@@ -29,7 +29,15 @@
         </div>
 
         {% if not user.is_authenticated %}
-            <div class="col d-flex justify-content-end">
+            <style>
+                @media screen and (max-width: 600px) {
+                    .mobile {
+                        visibility: hidden;
+                    }
+                }
+            </style>
+
+            <div class="col d-flex justify-content-end mobile">
                 <a href="/user/login/" class="lead">
                     <span lang="en">Sign In</span>
                     <span lang="hu">Bejelentkezés</span>

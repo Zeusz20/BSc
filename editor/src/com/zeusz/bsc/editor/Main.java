@@ -22,7 +22,7 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Localization.init(Main.class);
+        Localization.init(Main.class, null);
 
         // set icon and title
         primaryStage.getIcons().add(ResourceLoader.getFXImage("img/icon.png"));

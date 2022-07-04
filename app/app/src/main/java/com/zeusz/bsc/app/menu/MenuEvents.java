@@ -1,11 +1,7 @@
 package com.zeusz.bsc.app.menu;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.zeusz.bsc.app.JSWebView;
 import com.zeusz.bsc.app.R;
@@ -17,11 +13,12 @@ public final class MenuEvents {
     public static final int NEW_GAME = 0;
     public static final int EXIT_GAME = 1;
     public static final int DOWNLOAD = 2;
+    public static final int OPTIONS = 3;
 
     public static View.OnClickListener getEvent(Activity ctx, int eventID) {
         switch(eventID) {
             case NEW_GAME:
-                return null;
+                return listener -> Menu.show(ctx, Menu.NEW_GAME_MENU);
 
             case EXIT_GAME:
                 return listener -> ctx.finish();
@@ -30,9 +27,12 @@ public final class MenuEvents {
                 return listener -> {
                     ctx.setContentView(R.layout.download_screen);
                     JSWebView browser = ctx.findViewById(R.id.browser);
-                    browser.init(ctx);  // set up download procedure
+                    browser.init(ctx);
                     browser.loadUrl(Cloud.getCloudUrl("/user/search/"));
                 };
+
+            case OPTIONS:
+                return listener -> Menu.show(ctx, Menu.OPTIONS_MENU);
         }
 
         return null;

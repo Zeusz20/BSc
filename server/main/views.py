@@ -88,7 +88,7 @@ class ProjectView(View):
         from javaobj import loads
 
         with open(project.file.path, 'rb') as file:
-            jProject = loads(file.read())   # Project -> Boolean pair; boolean represents project's validity
+            jProject = loads(file.read())
 
         if hasattr(jProject, 'valid') and jProject.valid:
             project.author = jProject.author if jProject.author else '—'

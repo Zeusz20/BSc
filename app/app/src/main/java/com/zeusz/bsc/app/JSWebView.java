@@ -22,20 +22,18 @@ import java.util.Arrays;
 
 public class JSWebView extends WebView {
 
-    private BroadcastReceiver receiver;
+    private static BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @SuppressLint("SetJavaScriptEnabled")
     public JSWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(new WebViewClient());
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show();
-            }
-        };
     }
 
     public void init(Activity ctx) {
@@ -55,7 +53,7 @@ public class JSWebView extends WebView {
         if(!fileExists(ctx, filename)) {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setTitle(ctx.getResources().getString(R.string.app_name));
-            request.setDestinationInExternalFilesDir(ctx, null, filename);
+            request.setDestinationInExternalFilesDir(ctx, "projects", filename);
 
             DownloadManager manager = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
