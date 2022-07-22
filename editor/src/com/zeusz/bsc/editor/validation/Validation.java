@@ -2,8 +2,10 @@ package com.zeusz.bsc.editor.validation;
 
 import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
+import com.zeusz.bsc.editor.Editor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -13,12 +15,21 @@ public class Validation {
 
     /* Validations */
     public static Validation validate(GWObject object) {
-        if(object instanceof Project) return validateProject((Project) object);
-        if(object instanceof Object) return validateObject((Object) object);
-        if(object instanceof Attribute) return validateAttribute((Attribute) object);
-        if(object instanceof Question) return validateQuestion((Question) object);
+        Validation result = new Validation();
 
-        return new Validation();
+        if(object instanceof Project)
+            return validateProject((Project) object);
+
+        if(object instanceof Object)
+            return validateObject((Object) object);
+
+        if(object instanceof Attribute)
+            return validateAttribute((Attribute) object);
+
+        if(object instanceof Question)
+            return validateQuestion((Question) object);
+
+        return result;
     }
 
     private static Validation validateProject(Project project) {
@@ -70,6 +81,16 @@ public class Validation {
         // name cannot be empty
         if(item.getName().matches("\\s*"))
             validation.getErrors().add(Localization.localize("error.invalid_name"));
+
+        // name must be unique
+        Optional<String> name = Editor.getInstance().getProject().getItemList(item.getClass()).stream()
+                .filter(it -> !item.equals(it))
+                .map(Item::getName)
+                .filter(it -> item.getName().equals(it))
+                .findAny();
+
+        if(name.isPresent())
+            validation.getErrors().add(Localization.localize("error.not_unique_name"));
 
         return validation;
     }

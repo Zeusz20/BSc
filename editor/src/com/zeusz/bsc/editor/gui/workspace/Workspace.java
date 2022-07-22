@@ -22,8 +22,10 @@ public abstract class Workspace<T extends Item> extends BorderPane implements Dr
     public static Workspace<?> getWorkspace(Item item) {
         if(item.getClass() == Object.class)
             return new ObjectPane((Object) item);
+
         if(item.getClass() == Attribute.class)
             return new AttributePane((Attribute) item);
+
         if(item.getClass() == Question.class)
             return new QuestionPane((Question) item);
 
