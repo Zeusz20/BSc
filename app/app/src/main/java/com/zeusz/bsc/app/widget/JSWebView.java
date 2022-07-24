@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app;
+package com.zeusz.bsc.app.widget;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -8,13 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.zeusz.bsc.app.R;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,14 +28,12 @@ public class JSWebView extends WebView {
     };
 
     @SuppressLint("SetJavaScriptEnabled")
-    public JSWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+    public JSWebView(Activity ctx) {
+        super(ctx);
+
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(new WebViewClient());
-    }
 
-    public void init(Activity ctx) {
-        // set up download procedure
         setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
             if(url.endsWith(".gwp"))
                 downloadFile(ctx, url);
@@ -49,7 +45,7 @@ public class JSWebView extends WebView {
     private void downloadFile(Activity ctx, String url) {
         String filename = url.substring(url.lastIndexOf('/') + 1);
 
-        // Check if file is already downloaded If not queue a download request.
+        // Check if file is already downloaded. If not, queue a download request.
         if(!fileExists(ctx, filename)) {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setTitle(ctx.getResources().getString(R.string.app_name));
