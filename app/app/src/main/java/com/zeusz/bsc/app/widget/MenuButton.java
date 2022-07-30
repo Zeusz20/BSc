@@ -8,9 +8,10 @@ import androidx.appcompat.widget.AppCompatButton;
 
 public class MenuButton extends AppCompatButton {
 
-    public MenuButton(Activity ctx, String text) {
+    public MenuButton(Activity ctx, String text, Runnable onClick) {
         super(ctx);
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        setOnClickListener(listener -> onClick.run());
         setText(text);
     }
 

@@ -255,3 +255,11 @@ class UserView(View):
             else:
                 messages.error(request, localize(request, FAILED_PASSWORD_CHANGE))
                 return redirect('/user/settings/')
+
+
+class MultiplayerView(View):
+
+    action = None
+
+    def get(self, request):
+        pass

@@ -5,9 +5,10 @@
     android:id="@+id/menu_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_red_dark">
+    android:background="@android:color/holo_red_dark"
+    android:padding="8dp">
 
-    <LinearLayout
+    <com.zeusz.bsc.app.layout.MenuLayout
         android:id="@+id/menu_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <com.zeusz.bsc.app.layout.MenuLayout
         android:id="@+id/menu_body"
         android:layout_width="match_parent"
         android:layout_height="680dp"
@@ -29,12 +30,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu_header" />
 
-    <LinearLayout
+    <com.zeusz.bsc.app.layout.MenuLayout
         android:id="@+id/menu_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

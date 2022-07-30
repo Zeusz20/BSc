@@ -1,6 +1,5 @@
-package com.zeusz.bsc.app.widget;
+package com.zeusz.bsc.app;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -8,41 +7,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.core.Localization;
 
 import java.io.File;
 import java.util.Arrays;
 
 
-public class JSWebView extends WebView {
+public final class IOManager {
+
+    private IOManager() { }
 
     private static BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, Localization.localize("download.complete"), Toast.LENGTH_SHORT).show();
         }
     };
 
-    @SuppressLint("SetJavaScriptEnabled")
-    public JSWebView(Activity ctx) {
-        super(ctx);
-
-        getSettings().setJavaScriptEnabled(true);
-        setWebViewClient(new WebViewClient());
-
-        setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
-            if(url.endsWith(".gwp"))
-                downloadFile(ctx, url);
-            else
-                loadUrl(url);
-        });
-    }
-
-    private void downloadFile(Activity ctx, String url) {
+    public static void download(Activity ctx, String url) {
         String filename = url.substring(url.lastIndexOf('/') + 1);
 
         // Check if file is already downloaded. If not, queue a download request.
@@ -63,10 +47,11 @@ public class JSWebView extends WebView {
         }
     }
 
-    private boolean fileExists(Activity ctx, String name) {
+    public static boolean fileExists(Activity ctx, String filename) {
         File[] contents = ctx.getExternalFilesDir(null).listFiles();
+
         if(contents != null)
-            return Arrays.stream(contents).anyMatch(it -> it.getName().equals(name));
+            return Arrays.stream(contents).anyMatch(it -> it.getName().equals(filename));
 
         return true;
     }
