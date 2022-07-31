@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -22,7 +24,7 @@ public final class IOManager {
     private static BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, Localization.localize("download.complete"), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, Localization.localize("browser.download_complete"), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -54,6 +56,10 @@ public final class IOManager {
             return Arrays.stream(contents).anyMatch(it -> it.getName().equals(filename));
 
         return true;
+    }
+
+    public static Bitmap getImage(byte[] bytes) {
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
 }

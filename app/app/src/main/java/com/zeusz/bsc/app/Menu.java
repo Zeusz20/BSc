@@ -11,6 +11,7 @@ import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.JoinGameForm;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
+import com.zeusz.bsc.app.layout.ObjectChooser;
 import com.zeusz.bsc.app.layout.ProjectChooser;
 import com.zeusz.bsc.app.widget.BackButton;
 import com.zeusz.bsc.app.widget.Label;
@@ -64,7 +65,7 @@ public final class Menu {
                         new MenuButton(ctx, Localization.localize("menu.create_game"), () -> show(ctx, PROJECTS_MENU)),
                         new MenuButton(ctx, Localization.localize("menu.join_game"), () -> {
                             body.removeAllViews();
-                            body.addViews(new JoinGameForm(ctx));
+                            body.addView(new JoinGameForm(ctx));
                         })
                 );
                 footer.addView(new BackButton(ctx, MAIN_MENU));
