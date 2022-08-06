@@ -1,9 +1,10 @@
 package com.zeusz.bsc.app.layout;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
+import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.widget.LinearLayout;
 
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.widget.Label;
@@ -14,14 +15,16 @@ import com.zeusz.bsc.core.Localization;
 import java.util.regex.Pattern;
 
 
-public class JoinGameForm extends LinearLayout {
+public class JoinGameForm extends MenuLayout {
 
     public static final String PLAYER_ID_PATTERN = "^[0-9a-z]$";
 
+    public JoinGameForm(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
     public JoinGameForm(Activity ctx) {
-        super(ctx);
-        setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        setOrientation(VERTICAL);
+        super(ctx, VERTICAL);
 
         Label label = new Label(ctx, Localization.localize("menu.enter_id"));
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18.0f);

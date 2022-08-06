@@ -3,6 +3,7 @@ package com.zeusz.bsc.app;
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout.LayoutParams;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -11,7 +12,6 @@ import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.JoinGameForm;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
-import com.zeusz.bsc.app.layout.ObjectChooser;
 import com.zeusz.bsc.app.layout.ProjectChooser;
 import com.zeusz.bsc.app.widget.BackButton;
 import com.zeusz.bsc.app.widget.Label;
@@ -35,19 +35,18 @@ public final class Menu {
     }
 
     public static void show(Activity ctx, int menuID) {
-        // menu setup
-        ctx.setContentView(R.layout.menu_layout);
+        View menu = View.inflate(ctx, R.layout.menu_layout, null);
 
-        ConstraintLayout root = ctx.findViewById(R.id.menu_root);
-        MenuLayout header = ctx.findViewById(R.id.menu_header);
-        MenuLayout body = ctx.findViewById(R.id.menu_body);
-        MenuLayout footer = ctx.findViewById(R.id.menu_footer);
+        ConstraintLayout root = menu.findViewById(R.id.menu_root);
+        MenuLayout header = menu.findViewById(R.id.menu_header);
+        MenuLayout body = menu.findViewById(R.id.menu_body);
+        MenuLayout footer = menu.findViewById(R.id.menu_footer);
 
-        header.removeAllViews();
-        body.removeAllViews();
-        footer.removeAllViews();
+        render(ctx, menuID, root, header, body, footer);
+        ctx.setContentView(menu);
+    }
 
-        // menu render
+    private static void render(Activity ctx, int menuID, ConstraintLayout root, MenuLayout header, MenuLayout body, MenuLayout footer) {
         switch(menuID) {
             case MAIN_MENU:
                 header.addView(new Title(ctx));

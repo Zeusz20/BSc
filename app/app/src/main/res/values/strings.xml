@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Kérdezz! Felelek</string>
-    <string name="back">\u25c0</string>
+    <string name="object_image">Image of the object</string>
 </resources>
