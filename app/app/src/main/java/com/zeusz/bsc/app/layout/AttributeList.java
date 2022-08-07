@@ -18,7 +18,7 @@ public class AttributeList extends ListView {
     }
 
     public AttributeList(Activity ctx, List<Attribute> attributes) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
         setAdapter(new AttributeListAdapter(ctx, attributes));
     }
 

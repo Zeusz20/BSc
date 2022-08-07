@@ -5,7 +5,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
-import com.zeusz.bsc.app.Game;
+import com.zeusz.bsc.app.network.Game;
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
 
 import java.io.File;
@@ -19,7 +19,7 @@ public class ProjectChooser extends ListView {
     }
 
     public ProjectChooser(Activity ctx) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
 
         File[] files = ctx.getExternalFilesDir("projects").listFiles();
 

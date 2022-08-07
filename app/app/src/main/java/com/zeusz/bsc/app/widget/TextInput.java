@@ -1,8 +1,10 @@
 package com.zeusz.bsc.app.widget;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.text.InputFilter;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 
 import androidx.appcompat.widget.AppCompatEditText;
@@ -14,8 +16,12 @@ public class TextInput extends AppCompatEditText {
 
     private static final InputFilter MAX_LENGTH = new InputFilter.LengthFilter(4);
 
+    public TextInput(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
     public TextInput(Activity ctx) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
         setId(R.id.text_input);
         setTextColor(Color.WHITE);
         setTextAlignment(TEXT_ALIGNMENT_CENTER);

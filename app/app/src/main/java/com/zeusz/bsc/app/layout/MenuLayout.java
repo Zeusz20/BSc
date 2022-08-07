@@ -14,7 +14,7 @@ public class MenuLayout extends LinearLayout {
     }
 
     public MenuLayout(Activity ctx, int orientation, int height) {
-        this(ctx, null);
+        this(ctx, (AttributeSet) null);
         setOrientation(orientation);
         setHeight(height);
     }

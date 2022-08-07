@@ -20,7 +20,7 @@ public class ObjectChooser extends ListView {
     }
 
     public ObjectChooser(Activity ctx, Project project) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
         setAdapter(new ObjectListAdapter(ctx, project.getItemList(Object.class)));
         setClickable(true);
         setOnItemClickListener(null);   // TODO

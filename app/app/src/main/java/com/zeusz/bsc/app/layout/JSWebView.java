@@ -21,7 +21,7 @@ public class JSWebView extends WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
     public JSWebView(Activity ctx, @Nullable String homepage) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
 
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(new WebViewClient());

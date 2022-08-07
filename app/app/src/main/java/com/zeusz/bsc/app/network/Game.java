@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app;
+package com.zeusz.bsc.app.network;
 
 import android.app.Activity;
 

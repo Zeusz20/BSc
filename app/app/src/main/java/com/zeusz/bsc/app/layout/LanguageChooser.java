@@ -19,7 +19,7 @@ public class LanguageChooser extends ScrollView {
     }
 
     public LanguageChooser(Activity ctx) {
-        super(ctx);
+        this(ctx, (AttributeSet) null);
 
         MenuLayout languages = new MenuLayout(ctx, LinearLayout.VERTICAL, 512);
 

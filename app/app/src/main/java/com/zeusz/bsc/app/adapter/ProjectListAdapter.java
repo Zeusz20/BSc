@@ -18,7 +18,6 @@ public class ProjectListAdapter extends Adapter<File> {
 
     public ProjectListAdapter(Activity ctx, List<File> projects) {
         super(ctx, R.layout.project_item, projects);
-        this.ctx = ctx;
     }
 
     @Override
