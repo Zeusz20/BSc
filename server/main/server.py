@@ -36,20 +36,21 @@ class Server:
             client_thread = Thread(target=self._handle_client, args=[connection, address], daemon=True)
             client_thread.start()
 
-    def send(self, address, data):
-        self.socket.sendto(data.encode(SERVER_INFO['format']), address)
+    def send(self, connection, address, data):
+        message = (data + '\n').encode(SERVER_INFO['format'])
+        connection.sendto(message, address)
 
     def receive(self, connection):
-        return connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['format'])
+        return connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['format']).strip()
 
     def _handle_client(self, connection, address):
         try:
             while (message := self.receive(connection)) != SERVER_INFO['disconnect']:
                 if message == SERVER_INFO['create']:
-                    self._create_game(address)
+                    self._create_game(connection, address)
                 elif message == SERVER_INFO['join']:
                     game_id = self.receive(connection).upper()
-                    self._join_game(address, game_id)
+                    self._join_game(connection, address, game_id)
                 else:
                     self._communicate(message)
         except ValueError:
@@ -57,27 +58,40 @@ class Server:
 
         connection.close()
 
-    def _create_game(self, address):
+    def _create_game(self, connection, address):
         from string import ascii_uppercase, digits
         from random import choices
 
         game_id = ''.join(choices(ascii_uppercase + digits, k=4))
-        self.send(address, game_id)  # send back game id
-        self._clients[game_id] = {'host': address, 'join': None}  # waiting for other player
+        self.send(connection, address, game_id)  # send back game id
 
-    def _join_game(self, address, game_id):
+        # create game and wait for other player
+        self._clients[game_id] = {
+            'host': {
+                'connection': connection,
+                'address': address
+            },
+            'join': {
+                'connection': None,
+                'address': None
+            }
+        }
+
+    def _join_game(self, connection, address, game_id):
         from re import match
 
         if not match(SERVER_INFO['id_pattern'], game_id):
             raise ValueError(f'Invalid game ID: {game_id}')
 
         if not self._clients.get(game_id):
-            self.send(address, "Game doesn't exist")
+            self.send(connection, address, "Game doesn't exist")
         else:
             # establish connection
-            self._clients[game_id]['join'] = address
-            self.send(self._clients[game_id]['host'], SERVER_INFO['start'])
-            self.send(self._clients[game_id]['join'], SERVER_INFO['start'])
+            self._clients[game_id]['join']['connection'] = connection
+            self._clients[game_id]['join']['address'] = address
+
+            self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['start'])
+            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['start'])
 
     def _communicate(self, message):
         from json import JSONDecodeError, loads
@@ -92,10 +106,10 @@ class Server:
                 if decoded.get('disconnect'):
                     # inform other player about leaving and destroy the game
                     other = 'join' if is_host else 'host'
-                    self.send(self._clients[game_id][other], SERVER_INFO['disconnect'])
+                    self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
                     del self._clients[game_id]
                 else:
-                    self.send(self._clients[game_id][client], message)
+                    self.send(self._clients[game_id][client]['connection'], self._clients[game_id][client]['address'], message)
 
         except JSONDecodeError:
             raise ValueError('Invalid message format')
