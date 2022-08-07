@@ -257,9 +257,10 @@ class UserView(View):
                 return redirect('/user/settings/')
 
 
-class MultiplayerView(View):
-
-    action = None
+class GameView(View):
 
     def get(self, request):
-        pass
+        from django.http import JsonResponse
+        from .server import SERVER_INFO
+
+        return JsonResponse(SERVER_INFO)
