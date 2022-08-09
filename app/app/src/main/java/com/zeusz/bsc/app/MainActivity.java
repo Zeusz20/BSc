@@ -1,7 +1,6 @@
 package com.zeusz.bsc.app;
 
 import android.os.Bundle;
-import android.os.StrictMode;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,10 +15,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Localization.init(MainActivity.class, getFilesDir().getPath());
         Menu.show(this);
-
-        // TODO fix policy hack
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
     }
 
     @Override

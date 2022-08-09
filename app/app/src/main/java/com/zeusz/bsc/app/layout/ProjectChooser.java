@@ -5,10 +5,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
-import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
-import com.zeusz.bsc.app.network.Game;
-import com.zeusz.bsc.core.Project;
+import com.zeusz.bsc.app.network.Client;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,7 +28,7 @@ public class ProjectChooser extends ListView {
             setAdapter(adapter);
             setClickable(true);
             setOnItemClickListener((parent, view, position, id) -> {
-                new Game(ctx, adapter.getProject(position)).launch();
+                Client.launch(ctx, adapter.getProject(position), Client.State.CREATE);
             });
         }
     }
