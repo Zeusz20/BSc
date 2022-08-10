@@ -11,33 +11,28 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 
-final class ServerInfo implements Runnable {
+public final class ServerInfo {
 
     /* Singleton */
     private static final ServerInfo INSTANCE = new ServerInfo();
     public static ServerInfo getInstance() { return INSTANCE; }
 
     /* Class fields and methods */
-    private JSONObject[] wrapper;
+    private final JSONObject[] wrapper;
 
     private ServerInfo() {
         wrapper = new JSONObject[]{ null };
 
         try {
             // connect to server to get server info
-            Thread fetch = new Thread(this);
-            fetch.start();
-            fetch.join();   // wait for task to finish
+            Thread task = new Thread(() -> wrapJSONResponse()); // method reference doesn't work
+            task.start();
+            task.join();   // wait for task to finish
         }
         catch(InterruptedException e) { /* ignore */ }
     }
 
-    public JSONObject fetch() {
-        return wrapper[0];
-    }
-
-    @Override
-    public void run() {
+    private void wrapJSONResponse() {
         try(InputStream stream = new URL(Cloud.getCloudUrl("/game")).openStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 
@@ -47,6 +42,10 @@ final class ServerInfo implements Runnable {
         catch(Exception e) {
             wrapper[0] = null;
         }
+    }
+
+    public JSONObject fetch() {
+        return wrapper[0];
     }
 
 }

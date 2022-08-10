@@ -4,13 +4,12 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.zeusz.bsc.app.IOManager;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.List;
 
 
@@ -42,15 +41,7 @@ public class ProjectListAdapter extends Adapter<File> {
     }
 
     public Project getProject(int position) {
-        File file = getItem(position);
-
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            return (Project) ois.readObject();
-        }
-        catch(Exception e) {
-            // couldn't read project
-            return null;
-        }
+        return IOManager.loadProject(getItem(position));
     }
 
     public String getString(String string, String defaultString) {

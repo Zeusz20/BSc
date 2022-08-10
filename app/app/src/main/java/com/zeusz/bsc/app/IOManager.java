@@ -12,12 +12,17 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.zeusz.bsc.core.Localization;
+import com.zeusz.bsc.core.Project;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.Arrays;
 
 
 public final class IOManager {
+
+    private static final String PROJECT_DIR = "projects";
 
     private IOManager() { }
 
@@ -35,7 +40,7 @@ public final class IOManager {
         if(!fileExists(ctx, filename)) {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setTitle(ctx.getResources().getString(R.string.app_name));
-            request.setDestinationInExternalFilesDir(ctx, "projects", filename);
+            request.setDestinationInExternalFilesDir(ctx, PROJECT_DIR, filename);
 
             DownloadManager manager = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
@@ -50,12 +55,32 @@ public final class IOManager {
     }
 
     public static boolean fileExists(Activity ctx, String filename) {
-        File[] contents = ctx.getExternalFilesDir(null).listFiles();
+        // if IOManager::listProjects fails automatically assume file exists
+        File[] projects = listProjects(ctx);
+        return projects.length == 0 || Arrays.stream(projects).anyMatch(it -> it.getName().equals(filename));
+    }
 
-        if(contents != null)
-            return Arrays.stream(contents).anyMatch(it -> it.getName().equals(filename));
+    public static File[] listProjects(Activity ctx) {
+        File[] projects = ctx.getExternalFilesDir(PROJECT_DIR).listFiles();
+        return (projects != null) ? projects : new File[0];
+    }
 
-        return true;
+    public static Project loadProjectByFilename(Activity ctx, String filename) {
+        for(File file: listProjects(ctx))
+            if(file.getName().equals(filename))
+                return loadProject(file);
+
+        return null;
+    }
+
+    public static Project loadProject(File file) {
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (Project) ois.readObject();
+        }
+        catch(Exception e) {
+            // couldn't read file
+            return null;
+        }
     }
 
     public static Bitmap getImage(byte[] bytes) {

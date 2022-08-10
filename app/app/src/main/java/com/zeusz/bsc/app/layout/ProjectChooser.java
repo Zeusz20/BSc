@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.ListView;
 
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
-import com.zeusz.bsc.app.network.Client;
+import com.zeusz.bsc.app.network.GameClient;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,8 +27,9 @@ public class ProjectChooser extends ListView {
             ProjectListAdapter adapter = new ProjectListAdapter(ctx, Arrays.asList(files));
             setAdapter(adapter);
             setClickable(true);
+
             setOnItemClickListener((parent, view, position, id) -> {
-                Client.launch(ctx, adapter.getProject(position), Client.State.CREATE);
+                GameClient.launch(ctx, adapter.getProject(position), GameClient.State.CREATE);
             });
         }
     }

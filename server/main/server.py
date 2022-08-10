@@ -1,5 +1,6 @@
 import socket
 from threading import Thread
+from json import JSONDecodeError, loads
 
 SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
@@ -10,6 +11,7 @@ SERVER_INFO = {
     'create': '$_create',           # create new game
     'join': '$_join',               # connect to game
     'start': '$_start',             # players can communicate
+    'handshake': '$_handshake',     # establish connection between players
     'disconnect': '$_disconnect',   # disconnect from game
     'id_pattern': '^[A-Z0-9]{4}$',
 }
@@ -38,6 +40,7 @@ class Server:
 
     def send(self, connection, address, data):
         message = (data + '\n').encode(SERVER_INFO['format'])
+        print(address, message)
         connection.sendto(message, address)
 
     def receive(self, connection):
@@ -51,6 +54,10 @@ class Server:
                 elif message == SERVER_INFO['join']:
                     game_id = self.receive(connection).upper()
                     self._join_game(connection, address, game_id)
+                elif message == SERVER_INFO['handshake']:
+                    game_id = self.receive(connection).upper()
+                    filename = self.receive(connection)
+                    self._handshake(game_id, filename)
                 else:
                     self._communicate(message)
         except ValueError:
@@ -90,12 +97,13 @@ class Server:
             self._clients[game_id]['join']['connection'] = connection
             self._clients[game_id]['join']['address'] = address
 
-            self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['start'])
-            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['start'])
+            self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['handshake'])
+            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['handshake'])
+
+    def _handshake(self, game_id, filename):
+        self.send(self._clients[game_id]['join']['connection'], self._clients['join']['address'], filename)
 
     def _communicate(self, message):
-        from json import JSONDecodeError, loads
-
         try:
             decoded = loads(message)
             game_id = decoded.get('game_id')
