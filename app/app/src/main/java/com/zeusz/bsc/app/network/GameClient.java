@@ -1,7 +1,6 @@
 package com.zeusz.bsc.app.network;
 
 import android.app.Activity;
-import android.widget.Toast;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.io.Dictionary;
@@ -14,7 +13,6 @@ import com.zeusz.bsc.core.Project;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ConnectException;
@@ -27,27 +25,19 @@ public class GameClient implements Closeable {
     public static final Dictionary SERVER_INFO = ServerInfo.getInstance().fetch();
 
     private static void launch(Activity ctx, Project project, State state, String action, String id) {
-        new Thread(() -> {
+        new Thread(new Task(ctx, () -> {
             MainActivity activity = (MainActivity) ctx;
+            GameClient client = new GameClient(ctx, project);
 
-            try {
-                GameClient client = new GameClient(ctx, project);
+            activity.setGameClient(client);
+            client.setState(state);
+            client.connect();       // connect to server
+            client.listen();        // wait for response from server
+            client.send(action);    // send intent (create/join game)
 
-                activity.setGameClient(client);
-                client.setState(state);
-                client.connect();
-                client.listen();
-                client.send(action);
-
-                if(id != null)
-                    client.send(id);
-            }
-            catch(Exception e) {
-                // failed to connect
-                activity.setGameClient(null);
-                Toast.makeText(ctx, Localization.localize("game.connection_error"), Toast.LENGTH_LONG).show();
-            }
-        }).start();
+            // send game id to which game player wants to connect
+            if(id != null) client.send(id);
+        })).start();
     }
 
     public static void createGame(Activity ctx, Project project) {
@@ -62,7 +52,7 @@ public class GameClient implements Closeable {
     public enum State { CREATE, WAITING, JOIN, HANDSHAKE, IN_GAME }
 
     /* Class fields and methods */
-    protected final Game game;
+    protected Game game;
     protected String id;
 
     protected State state;
@@ -94,21 +84,19 @@ public class GameClient implements Closeable {
     }
 
     public void listen() {
-        new Thread(() -> {
-            try {
-                while(socket.isConnected())
-                    parse(reader.readLine());
-            }
-            catch(Exception e) {
-                close();
-            }
-        }).start();
+        new Thread(new Task(game.getContext(), () -> {
+            while(socket.isConnected())
+                parse(reader.readLine());
+        })).start();
     }
 
-    public void send(String message) throws IOException {
+    public void send(String message) throws Exception {
         writer.write(message);
         writer.newLine();
         writer.flush();
+
+        // wait for server to process sent message before client can send another one
+        Thread.sleep(100);
     }
 
     public void parse(String response) throws Exception {
@@ -125,14 +113,17 @@ public class GameClient implements Closeable {
 
     protected void initGame(boolean isHost, String id) {
         // game doesn't exist
-        if(id.equals(SERVER_INFO.getString("invalid")))
-            Toast.makeText(game.getContext(), Localization.localize("game.invalid"), Toast.LENGTH_SHORT).show();
+        if(id.equals(SERVER_INFO.getString("invalid"))) {
+            Game.info(game.getContext(), Localization.localize("game.invalid"));
+            game.getContext().destroyGameClient();
+        }
+        else {
+            this.isHost = isHost;
+            this.id = id;
 
-        this.isHost = isHost;
-        this.id = id;
-
-        setState(State.WAITING);    // wait for other player
-        if(isHost) game.waitForPlayer();
+            setState(State.WAITING);    // wait for other player
+            if(isHost) game.waitForPlayer();
+        }
     }
 
     protected void onConnected(String response) throws Exception {
@@ -163,7 +154,7 @@ public class GameClient implements Closeable {
     public void close() {
         Thread disconnect = new Thread(() -> {
             try { send(SERVER_INFO.getString("disconnect")); }
-            catch(IOException e) { /* couldn't connect to server */ }
+            catch(Exception e) { /* couldn't connect to server */ }
         });
 
         try {
@@ -178,11 +169,6 @@ public class GameClient implements Closeable {
         }
         catch(Exception e) {
             // couldn't close channels
-        }
-        finally {
-            // destroy client instance
-            MainActivity activity = (MainActivity) game.getContext();
-            activity.setGameClient(null);
         }
     }
 

@@ -26,8 +26,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.back_btn).callOnClick();
     }
 
-    public void setGameClient(GameClient client) { this.client = client; }
+    public void destroyGameClient() {
+        if(client != null) {
+            client.close();
+            client = null;
+        }
+    }
 
-    public GameClient getGameClient() { return client; }
+    public void setGameClient(GameClient client) {
+        this.client = client;
+    }
+
+    public GameClient getGameClient() {
+        return client;
+    }
 
 }

@@ -19,10 +19,9 @@ public class BackButton extends MenuButton {
     public BackButton(Activity ctx, int previousMenuID) {
         super(ctx, Localization.localize("menu.back"), () -> {
             MainActivity activity = (MainActivity) ctx;
-            Menu.show(activity, previousMenuID);
+            activity.destroyGameClient();
 
-            if(activity.getGameClient() != null)
-                activity.getGameClient().close();
+            Menu.show(activity, previousMenuID);
         });
 
         setId(R.id.back_btn);

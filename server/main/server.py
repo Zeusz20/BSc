@@ -105,7 +105,7 @@ class Server:
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['handshake'])
 
     def _handshake(self, game_id, filename):
-        self.send(self._clients[game_id]['join']['connection'], self._clients['join']['address'], filename)
+        self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], filename)
 
     def _communicate(self, message):
         try:

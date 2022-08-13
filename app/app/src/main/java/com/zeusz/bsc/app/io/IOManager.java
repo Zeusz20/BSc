@@ -9,9 +9,9 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.widget.Toast;
 
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 
@@ -30,7 +30,7 @@ public final class IOManager {
     private static BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, Localization.localize("browser.download_complete"), Toast.LENGTH_SHORT).show();
+            Game.info(context, Localization.localize("browser.download_complete"));
         }
     };
 

@@ -1,7 +1,10 @@
 package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
+import android.content.Context;
+import android.widget.Toast;
 
+import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.io.Dictionary;
 import com.zeusz.bsc.app.io.IOManager;
@@ -10,11 +13,17 @@ import com.zeusz.bsc.core.Project;
 
 public final class Game {
 
-    private final Activity ctx;
+    /* Static functionality */
+    public static void info(Context context, String message) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    /* Class fields and methods */
+    private final MainActivity ctx;
     private Project project;
 
     public Game(Activity ctx, Project project) {
-        this.ctx = ctx;
+        this.ctx = (MainActivity) ctx;
         this.project = project;
     }
 
@@ -35,7 +44,7 @@ public final class Game {
         project = IOManager.loadProjectByFilename(ctx, filename);
     }
 
-    public Activity getContext() { return ctx; }
+    public MainActivity getContext() { return ctx; }
 
     public Project getProject() { return project; }
 
