@@ -5,10 +5,14 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.zeusz.bsc.app.network.GameClient;
+import com.zeusz.bsc.app.ui.Menu;
 import com.zeusz.bsc.core.Localization;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    private GameClient client;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)  {
@@ -19,8 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // TODO
-        Menu.show(this);
+        findViewById(R.id.back_btn).callOnClick();
     }
+
+    public void setGameClient(GameClient client) { this.client = client; }
+
+    public GameClient getGameClient() { return client; }
 
 }

@@ -1,8 +1,7 @@
 package com.zeusz.bsc.app.network;
 
+import com.zeusz.bsc.app.io.Dictionary;
 import com.zeusz.bsc.core.Cloud;
-
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -18,10 +17,10 @@ public final class ServerInfo {
     public static ServerInfo getInstance() { return INSTANCE; }
 
     /* Class fields and methods */
-    private final JSONObject[] wrapper;
+    private final Dictionary[] wrapper;
 
     private ServerInfo() {
-        wrapper = new JSONObject[]{ null };
+        wrapper = new Dictionary[]{ null };
 
         try {
             // connect to server to get server info
@@ -37,14 +36,14 @@ public final class ServerInfo {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 
             // read server response
-            wrapper[0] = new JSONObject(reader.readLine());
+            wrapper[0] = new Dictionary(reader.readLine());
         }
         catch(Exception e) {
             wrapper[0] = null;
         }
     }
 
-    public JSONObject fetch() {
+    public Dictionary fetch() {
         return wrapper[0];
     }
 

@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.widget.Label;
 import com.zeusz.bsc.app.widget.MenuButton;
 import com.zeusz.bsc.app.widget.TextInput;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class JoinGameForm extends MenuLayout {
 
-    public static final String PLAYER_ID_PATTERN = "^[0-9a-z]$";
+    public static final String PLAYER_ID_PATTERN = "^[0-9A-Z]{4}$";
 
     public JoinGameForm(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,16 +36,13 @@ public class JoinGameForm extends MenuLayout {
             Editable raw = ((TextInput) ctx.findViewById(R.id.text_input)).getText();
 
             if(raw != null) {
-                String playerID = raw.toString().toLowerCase();
-                connect(playerID);
+                String id = raw.toString().toUpperCase();
+
+                // connect to game
+                if(Pattern.matches(PLAYER_ID_PATTERN, id))
+                    GameClient.joinGame(ctx, id);
             }
         }));
-    }
-
-    public void connect(String playerID) {
-        if(Pattern.matches(PLAYER_ID_PATTERN, playerID)) {
-            // TODO
-        }
     }
 
 }

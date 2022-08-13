@@ -13,6 +13,7 @@ SERVER_INFO = {
     'start': '$_start',             # players can communicate
     'handshake': '$_handshake',     # establish connection between players
     'disconnect': '$_disconnect',   # disconnect from game
+    'invalid': '$_invalid',         # invalid game id
     'id_pattern': '^[A-Z0-9]{4}$',
 }
 
@@ -40,23 +41,25 @@ class Server:
 
     def send(self, connection, address, data):
         message = (data + '\n').encode(SERVER_INFO['format'])
-        print(address, message)
+        print('[SEND]', address, message)
         connection.sendto(message, address)
 
-    def receive(self, connection):
-        return connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['format']).strip()
+    def receive(self, connection, address):
+        message = connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['format']).strip()
+        print('[RECV]', address, message)
+        return message
 
     def _handle_client(self, connection, address):
         try:
-            while (message := self.receive(connection)) != SERVER_INFO['disconnect']:
+            while (message := self.receive(connection, address)) != SERVER_INFO['disconnect']:
                 if message == SERVER_INFO['create']:
                     self._create_game(connection, address)
                 elif message == SERVER_INFO['join']:
-                    game_id = self.receive(connection).upper()
+                    game_id = self.receive(connection, address).upper()
                     self._join_game(connection, address, game_id)
                 elif message == SERVER_INFO['handshake']:
-                    game_id = self.receive(connection).upper()
-                    filename = self.receive(connection)
+                    game_id = self.receive(connection, address).upper()
+                    filename = self.receive(connection, address)
                     self._handshake(game_id, filename)
                 else:
                     self._communicate(message)
@@ -87,17 +90,18 @@ class Server:
     def _join_game(self, connection, address, game_id):
         from re import match
 
-        if not match(SERVER_INFO['id_pattern'], game_id):
-            raise ValueError(f'Invalid game ID: {game_id}')
-
-        if not self._clients.get(game_id):
-            self.send(connection, address, "Game doesn't exist")
+        if not match(SERVER_INFO['id_pattern'], game_id) or self._clients.get(game_id) is None:
+            self.send(connection, address, SERVER_INFO['invalid'])
         else:
             # establish connection
             self._clients[game_id]['join']['connection'] = connection
             self._clients[game_id]['join']['address'] = address
 
+            # send to host
             self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['handshake'])
+            
+            # send to join
+            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], game_id)
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['handshake'])
 
     def _handshake(self, game_id, filename):

@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app;
+package com.zeusz.bsc.app.io;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 

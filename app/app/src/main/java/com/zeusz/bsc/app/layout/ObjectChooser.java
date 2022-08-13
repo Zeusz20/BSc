@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.adapter.ObjectListAdapter;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;

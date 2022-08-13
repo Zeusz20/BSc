@@ -29,7 +29,7 @@ public class ProjectChooser extends ListView {
             setClickable(true);
 
             setOnItemClickListener((parent, view, position, id) -> {
-                GameClient.launch(ctx, adapter.getProject(position), GameClient.State.CREATE);
+                GameClient.createGame(ctx, adapter.getProject(position));
             });
         }
     }

@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app;
+package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -8,6 +8,8 @@ import android.widget.LinearLayout.LayoutParams;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.zeusz.bsc.app.MainActivity;
+import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.JoinGameForm;
 import com.zeusz.bsc.app.layout.LanguageChooser;
@@ -15,6 +17,7 @@ import com.zeusz.bsc.app.layout.MenuLayout;
 import com.zeusz.bsc.app.layout.ProjectChooser;
 import com.zeusz.bsc.app.widget.BackButton;
 import com.zeusz.bsc.app.widget.Label;
+import com.zeusz.bsc.app.widget.LoadingIcon;
 import com.zeusz.bsc.app.widget.MenuButton;
 import com.zeusz.bsc.app.widget.Title;
 import com.zeusz.bsc.core.Localization;
@@ -29,6 +32,7 @@ public final class Menu {
     public static final int PROJECTS_MENU = 2;
     public static final int OPTIONS_MENU = 3;
     public static final int DOWNLOAD_MENU = 4;
+    public static final int WAITING_FOR_PLAYER = 5;
 
     public static void show(Activity ctx) {
         show(ctx, MAIN_MENU);
@@ -96,6 +100,17 @@ public final class Menu {
 
                 body.addView(browser);
                 footer.addView(new BackButton(ctx, MAIN_MENU));
+                break;
+
+            case WAITING_FOR_PLAYER:
+                MainActivity activity = (MainActivity) ctx;
+
+                header.addViews(
+                        new Label(ctx, Localization.localize("game.your_id")),
+                        new Label(ctx, activity.getGameClient().getId(), 48.0f)
+                );
+                body.addView(new LoadingIcon(ctx));
+                footer.addView(new BackButton(ctx, PROJECTS_MENU));
                 break;
         }
     }

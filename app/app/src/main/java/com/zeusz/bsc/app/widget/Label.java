@@ -17,9 +17,13 @@ public class Label extends AppCompatTextView {
     }
 
     public Label(Activity ctx, String text) {
+        this(ctx, text, 24.0f);
+    }
+
+    public Label(Activity ctx, String text, float size) {
         this(ctx, (AttributeSet) null);
         setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 24.0f);
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
         setTextColor(Color.WHITE);
         setText(text);
     }

@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.zeusz.bsc.app.IOManager;
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.io.IOManager;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 

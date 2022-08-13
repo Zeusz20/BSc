@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.zeusz.bsc.app.Menu;
+import com.zeusz.bsc.app.MainActivity;
+import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.ui.Menu;
 import com.zeusz.bsc.core.Localization;
 
 
@@ -15,7 +17,15 @@ public class BackButton extends MenuButton {
     }
 
     public BackButton(Activity ctx, int previousMenuID) {
-        super(ctx, Localization.localize("menu.back"), () -> Menu.show(ctx, previousMenuID));
+        super(ctx, Localization.localize("menu.back"), () -> {
+            MainActivity activity = (MainActivity) ctx;
+            Menu.show(activity, previousMenuID);
+
+            if(activity.getGameClient() != null)
+                activity.getGameClient().close();
+        });
+
+        setId(R.id.back_btn);
     }
 
 }
