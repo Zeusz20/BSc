@@ -6,7 +6,7 @@ from django.db.transaction import atomic
 from django.shortcuts import render
 from django.views import View
 from .localization import *
-from .models import GWProject
+from .models import Project
 
 # TODO
 #   client to client
@@ -46,7 +46,7 @@ class ProjectView(View):
             messages.error(request, localize(request, INVALID_FILE))
         except FileExistsError:
             messages.error(request, localize(request, FILE_EXISTS))
-        except (FileNotFoundError, GWProject.DoesNotExist):
+        except (FileNotFoundError, Project.DoesNotExist):
             pass
 
         return redirect('/user/home/')
@@ -56,32 +56,28 @@ class ProjectView(View):
         file = request.FILES.get('file')
 
         if file:
-            project = GWProject(user=request.user, file=file)
+            project = Project(user=request.user, file=file)
             project.save()
             self._update_meta(project)
             messages.success(request, localize(request, FILE_UPLOAD))
 
     @atomic
     def _update_entry(self, request):
-        project = GWProject.objects.select_for_update().get(id=request.POST.get('id', -1))
-        old_file = project.file
-        new_file = request.FILES.get('file')
+        old_project = Project.objects.select_for_update().get(id=request.POST.get('id', -1))
+        old_project.deleted = True
+        old_project.save()
 
-        if new_file:
-            project.file = new_file
-            project.save()
-            self._update_meta(project)
-            self._remove_orphaned_files(old_file)
-            messages.success(request, localize(request, FILE_UPDATE))
+        self._save_entry(request)
+        messages.success(request, localize(request, FILE_UPDATE))
 
     @atomic
     def _delete_entry(self, request):
         project_id = request.POST.get('id')
 
         if project_id:
-            project = GWProject.objects.select_for_update().get(id=project_id)
-            self._remove_orphaned_files(project.file)
-            project.delete()
+            project = Project.objects.select_for_update().get(id=project_id)
+            project.deleted = True
+            project.save()
             messages.success(request, localize(request, FILE_DELETE))
 
     def _update_meta(self, project):
@@ -127,11 +123,13 @@ class UserView(View):
             from django.core.paginator import Paginator
             from django.db.models import Q
 
+            not_deleted = Q(deleted=False)
+
             if authenticated:
                 db_param = Q(user=request.user) if self.view == 'home' else ~Q(user=request.user)
-                projects = GWProject.objects.filter(db_param)
+                projects = Project.objects.filter(db_param & not_deleted)
             else:
-                projects = GWProject.objects.all()
+                projects = Project.objects.filter(not_deleted)
 
             query = request.GET.get('query')
             page = request.GET.get('page', '1')

@@ -14,7 +14,7 @@ def check_file(model, filename):
     model.file.open()
     new_file_hash = sha256(model.file.read()).digest()
 
-    for project in GWProject.objects.all():
+    for project in Project.objects.all():
         project.file.open()
         file_hash = sha256(project.file.read()).digest()
         if new_file_hash == file_hash:
@@ -23,13 +23,14 @@ def check_file(model, filename):
     return filename
 
 
-class GWProject(Model):
+class Project(Model):
     user = ForeignKey(User, on_delete=CASCADE)
     author = CharField(max_length=128)
     name = CharField(max_length=128)
     description = TextField()
     file = FileField(upload_to=check_file)
     date_added = TimeField(default=datetime.today())
+    deleted = BooleanField(default=False)
 
     def serialize(self):
         return {
