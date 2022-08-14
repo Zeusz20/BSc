@@ -13,10 +13,12 @@ import com.zeusz.bsc.core.Project;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.URLEncoder;
 
 
 public class GameClient implements Closeable {
@@ -24,7 +26,16 @@ public class GameClient implements Closeable {
     /* Static functionality */
     public static final Dictionary SERVER_INFO = ServerInfo.getInstance().fetch();
 
-    private static void launch(Activity ctx, Project project, State state, String action, String id) {
+    /**
+     * @param state
+     *  In which state the client will be after creation.
+     * @param action
+     *  Which action will the client perform (host or join).
+     * @param initial
+     *  The initial message to the server. This holds the name of the projects
+     *  in case of hosting a game; and the ID of the game in case of joining to one.
+     * */
+    private static void launch(Activity ctx, Project project, State state, String action, String initial) {
         new Thread(new Task(ctx, () -> {
             MainActivity activity = (MainActivity) ctx;
             GameClient client = new GameClient(ctx, project);
@@ -34,14 +45,12 @@ public class GameClient implements Closeable {
             client.connect();       // connect to server
             client.listen();        // wait for response from server
             client.send(action);    // send intent (create/join game)
-
-            // send game id to which game player wants to connect
-            if(id != null) client.send(id);
+            client.send(initial);
         })).start();
     }
 
     public static void createGame(Activity ctx, Project project) {
-        launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), null);
+        launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), project.getSource().getName());
     }
 
     public static void joinGame(Activity ctx, String id) {
@@ -49,12 +58,13 @@ public class GameClient implements Closeable {
     }
 
     /* Client states */
-    public enum State { CREATE, WAITING, JOIN, HANDSHAKE, IN_GAME }
+    public enum State { CREATE, WAITING, JOIN, FILE_DOWNLOAD, IN_GAME }
 
     /* Class fields and methods */
+    private final MainActivity ctx;
     protected Game game;
-    protected String id;
 
+    protected String id;
     protected State state;
     protected boolean isHost;
 
@@ -66,7 +76,8 @@ public class GameClient implements Closeable {
         if(SERVER_INFO == null)
             throw new ConnectException("Couldn't connect to server");
 
-        game = new Game(ctx, project);
+        this.ctx = (MainActivity) ctx;
+        this.game = new Game(project);
     }
 
     public void setState(State state) { this.state = state; }
@@ -84,7 +95,7 @@ public class GameClient implements Closeable {
     }
 
     public void listen() {
-        new Thread(new Task(game.getContext(), () -> {
+        new Thread(new Task(ctx, () -> {
             while(socket.isConnected())
                 parse(reader.readLine());
         })).start();
@@ -96,58 +107,101 @@ public class GameClient implements Closeable {
         writer.flush();
 
         // wait for server to process sent message before client can send another one
-        Thread.sleep(100);
+        Thread.sleep(10);
     }
 
-    public void parse(String response) throws Exception {
+    public synchronized void parse(String response) throws Exception {
         if(response == null) return;
 
         switch(state) {
-            case CREATE: initGame(true, response); break;
-            case JOIN: initGame(false, response); break;
-            case WAITING: onConnected(response); break;
-            case HANDSHAKE: handshake(response); break;
-            case IN_GAME: game.update(new Dictionary(response)); break;
+            case CREATE:
+            case JOIN:
+                // the activity which creates the game is the host
+                initGame((state == State.CREATE), response);
+                break;
+
+            case WAITING:
+                waitForPlayer(response);
+                break;
+
+            case FILE_DOWNLOAD:
+                downloadProject(response);
+                break;
+
+            case IN_GAME:
+                game.update(ctx, new Dictionary(response));
+                break;
         }
     }
 
+    /** @return The base structure of a request. */
+    protected Dictionary getMessage() throws Exception {
+        Dictionary dictionary = new Dictionary(null);
+        dictionary.put("is_host", isHost);
+        dictionary.put("game_id", id);
+
+        return dictionary;
+    }
+
+    /**
+     * Initializes the game and the client when it is in the state of CREATE or JOIN.
+     * After initialization the host is put to the WAITING state, while the
+     * joining player is put in the FILE_DOWNLOAD state.
+     * */
     protected void initGame(boolean isHost, String id) {
-        // game doesn't exist
         if(id.equals(SERVER_INFO.getString("invalid"))) {
-            Game.info(game.getContext(), Localization.localize("game.invalid"));
-            game.getContext().destroyGameClient();
+            // game doesn't exist
+            Game.info(ctx, Localization.localize("game.invalid"));
+            ctx.destroyGameClient();
         }
         else {
             this.isHost = isHost;
             this.id = id;
 
-            setState(State.WAITING);    // wait for other player
-            if(isHost) game.waitForPlayer();
+            setState(isHost ? State.WAITING : State.FILE_DOWNLOAD);
+            if(isHost) game.loadingScreen(ctx);  // render waiting screen
         }
     }
 
-    protected void onConnected(String response) throws Exception {
-        if(response.equals(SERVER_INFO.getString("handshake")))
-            setState(State.HANDSHAKE);
-
-        // send which project will be played
-        if(isHost) {
-            send(SERVER_INFO.getString("handshake"));
-            send(id);   // needed for identification
-            send(game.getProject().getSource().getName());
-        }
+    /**
+     * While client is in the WAITING state, it waits for the other player to
+     * download the project file (if not present on their machine).
+     * The connection is established when the server sends the "ready" response.
+     * */
+    protected void waitForPlayer(String response) throws Exception {
+        if(SERVER_INFO.getString("ready").equals(response))
+            load(null);  // start game
     }
 
-    protected void handshake(String filename) {
-        // download hosted game file if not present on machine
+    /**
+     * In the FILE_DOWNLOAD state the joining player downloads the project
+     * file to their machine if not present. After the download finished the
+     * {@link #load(String)} method will load the project and the client's
+     * state will be changed to IN_GAME.
+     * */
+    protected void downloadProject(String filename) throws Exception {
         if(!isHost) {
-            String url = Cloud.getCloudUrl("/projects/" + filename);
-            IOManager.download(game.getContext(), url);
-            game.loadProject(filename);
+            String encoded = URLEncoder.encode(filename, SERVER_INFO.getString("format"));
+            String url = Cloud.getCloudUrl("/projects/" + encoded);
+            IOManager.download(ctx, url);  // download project file if missing
+        }
+    }
+
+    /**
+     * Loads the project to memory.
+     * If joining player doesn't have the project file, this method is invoked
+     * by the {@link DownloadReceiver} class when the project is finished downloading.
+     * */
+    public void load(String filename) throws Exception {
+        // host already has the project loaded
+        if(!isHost) {
+            game.loadProject(ctx, filename);
+            send(SERVER_INFO.getString("ready"));
+            send(id);   // needed for identification
         }
 
         setState(State.IN_GAME);
-        game.start();
+        game.start(ctx);
     }
 
     @Override
@@ -158,17 +212,23 @@ public class GameClient implements Closeable {
         });
 
         try {
-            // disconnect
+            // disconnect from server
             disconnect.start();
             disconnect.join();
-
-            // close channels
-            if(reader != null) reader.close();
-            if(writer != null) writer.close();
-            if(socket != null) socket.close();
         }
         catch(Exception e) {
-            // couldn't close channels
+            // couldn't disconnect cleanly from the server
+        }
+        finally {
+            try {
+                // close channels
+                if(reader != null) reader.close();
+                if(writer != null) writer.close();
+                if(socket != null) socket.close();
+            }
+            catch(IOException e) {
+                // couldn't close channels
+            }
         }
     }
 

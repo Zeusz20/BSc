@@ -11,7 +11,7 @@ SERVER_INFO = {
     'create': '$_create',           # create new game
     'join': '$_join',               # connect to game
     'start': '$_start',             # players can communicate
-    'handshake': '$_handshake',     # establish connection between players
+    'ready': '$_ready',             # joining player is ready
     'disconnect': '$_disconnect',   # disconnect from game
     'invalid': '$_invalid',         # invalid game id
     'id_pattern': '^[A-Z0-9]{4}$',
@@ -53,22 +53,22 @@ class Server:
         try:
             while (message := self.receive(connection, address)) != SERVER_INFO['disconnect']:
                 if message == SERVER_INFO['create']:
-                    self._create_game(connection, address)
+                    filename = self.receive(connection, address)
+                    self._create_game(connection, address, filename)
                 elif message == SERVER_INFO['join']:
                     game_id = self.receive(connection, address).upper()
                     self._join_game(connection, address, game_id)
-                elif message == SERVER_INFO['handshake']:
+                elif message == SERVER_INFO['ready']:
                     game_id = self.receive(connection, address).upper()
-                    filename = self.receive(connection, address)
-                    self._handshake(game_id, filename)
+                    self._start_game(game_id)
                 else:
-                    self._communicate(message)
-        except ValueError:
+                    self._communicate(loads(message))
+        except JSONDecodeError or ValueError:
             pass
 
         connection.close()
 
-    def _create_game(self, connection, address):
+    def _create_game(self, connection, address, filename):
         from string import ascii_uppercase, digits
         from random import choices
 
@@ -84,7 +84,8 @@ class Server:
             'join': {
                 'connection': None,
                 'address': None
-            }
+            },
+            'project': filename,
         }
 
     def _join_game(self, connection, address, game_id):
@@ -96,32 +97,25 @@ class Server:
             # establish connection
             self._clients[game_id]['join']['connection'] = connection
             self._clients[game_id]['join']['address'] = address
-
-            # send to host
-            self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['handshake'])
             
-            # send to join
+            # send to game data to join
+            project = self._clients[game_id]['project']
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], game_id)
-            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], SERVER_INFO['handshake'])
+            self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], project)
 
-    def _handshake(self, game_id, filename):
-        self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], filename)
+    def _start_game(self, game_id):
+        self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['ready'])
 
     def _communicate(self, message):
-        try:
-            decoded = loads(message)
-            game_id = decoded.get('game_id')
-            is_host = decoded.get('is_host')
-            client = 'host' if is_host else 'join'
+        game_id = message.get('game_id')
+        is_host = message.get('is_host')
+        client = 'host' if is_host else 'join'
 
-            if self._clients.get(game_id):
-                if decoded.get('disconnect'):
-                    # inform other player about leaving and destroy the game
-                    other = 'join' if is_host else 'host'
-                    self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
-                    del self._clients[game_id]
-                else:
-                    self.send(self._clients[game_id][client]['connection'], self._clients[game_id][client]['address'], message)
-
-        except JSONDecodeError:
-            raise ValueError('Invalid message format')
+        if self._clients.get(game_id):
+            if message.get('disconnect'):
+                # inform other player about leaving and destroy the game
+                other = 'join' if is_host else 'host'
+                self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
+                del self._clients[game_id]
+            else:
+                self.send(self._clients[game_id][client]['connection'], self._clients[game_id][client]['address'], message)

@@ -109,7 +109,10 @@ public final class Menu {
                         new Label(ctx, Localization.localize("game.your_id")),
                         new Label(ctx, activity.getGameClient().getId(), 48.0f)
                 );
-                body.addView(new LoadingIcon(ctx));
+                body.addViews(
+                        new Label(ctx, Localization.localize("game.waiting_for_player")),
+                        new LoadingIcon(ctx)
+                );
                 footer.addView(new BackButton(ctx, PROJECTS_MENU));
                 break;
         }

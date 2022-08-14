@@ -27,8 +27,10 @@ public class JSWebView extends WebView {
         setWebViewClient(new WebViewClient());
 
         setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
-            if(url.endsWith(".gwp")) IOManager.download(ctx, url);
-            else loadUrl(url);
+            if(url.endsWith(".gwp"))
+                IOManager.download(ctx, url);
+            else
+                loadUrl(url);
         });
 
         if(homepage != null)

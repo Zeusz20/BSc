@@ -2,23 +2,22 @@ package com.zeusz.bsc.app.io;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import com.zeusz.bsc.app.R;
-import com.zeusz.bsc.app.ui.Game;
-import com.zeusz.bsc.core.Localization;
+import com.zeusz.bsc.app.network.DownloadReceiver;
 import com.zeusz.bsc.core.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public final class IOManager {
@@ -27,15 +26,9 @@ public final class IOManager {
 
     private IOManager() { }
 
-    private static BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Game.info(context, Localization.localize("browser.download_complete"));
-        }
-    };
-
     public static void download(Activity ctx, String url) {
         String filename = url.substring(url.lastIndexOf('/') + 1);
+        DownloadReceiver receiver = new DownloadReceiver(filename);
 
         // Check if file is already downloaded. If not, queue a download request.
         if(!fileExists(ctx, filename)) {
@@ -46,24 +39,22 @@ public final class IOManager {
             DownloadManager manager = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
 
-            // show toast message
+            // show toast message (receiver will unregister itself)
             ctx.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         }
         else {
             // show toast message anyway, so users won't get confused
-            receiver.onReceive(ctx, null);
+            receiver.inform(ctx);
         }
     }
 
     public static boolean fileExists(Activity ctx, String filename) {
-        // if IOManager::listProjects fails automatically assume file exists
-        File[] projects = listProjects(ctx);
-        return projects.length == 0 || Arrays.stream(projects).anyMatch(it -> it.getName().equals(filename));
+        return listProjects(ctx).stream().anyMatch(it -> it.getName().equals(filename));
     }
 
-    public static File[] listProjects(Activity ctx) {
-        File[] projects = ctx.getExternalFilesDir(PROJECT_DIR).listFiles();
-        return (projects != null) ? projects : new File[0];
+    public static List<File> listProjects(Activity ctx) {
+        File[] files = ctx.getExternalFilesDir(PROJECT_DIR).listFiles();
+        return (files != null) ? Arrays.asList(files) : Collections.emptyList();
     }
 
     public static Project loadProjectByFilename(Activity ctx, String filename) {
@@ -76,7 +67,10 @@ public final class IOManager {
 
     public static Project loadProject(File file) {
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            return (Project) ois.readObject();
+            Project project = (Project) ois.readObject();
+            project.setSource(file);
+
+            return project;
         }
         catch(Exception e) {
             // couldn't read file
