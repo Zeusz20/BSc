@@ -15,6 +15,9 @@ import com.zeusz.bsc.core.Project;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +29,18 @@ public final class IOManager {
 
     private IOManager() { }
 
+    public static String encodeString(String string) {
+        try { return URLEncoder.encode(string, StandardCharsets.UTF_8.name()); }
+        catch(Exception e) { return string; }
+    }
+
+    public static String decodeString(String string) {
+        try { return URLDecoder.decode(string, StandardCharsets.UTF_8.name()); }
+        catch(Exception e) { return string; }
+    }
+
     public static void download(Activity ctx, String url) {
-        String filename = url.substring(url.lastIndexOf('/') + 1);
+        String filename = decodeString(url.substring(url.lastIndexOf('/') + 1));
         DownloadReceiver receiver = new DownloadReceiver(filename);
 
         // Check if file is already downloaded. If not, queue a download request.

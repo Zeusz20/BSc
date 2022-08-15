@@ -20,14 +20,19 @@ public class DownloadReceiver extends BroadcastReceiver {
     public void inform(Context context) {
         MainActivity ctx = (MainActivity) context;
 
-        // inform machine
+        /* INFORM MACHINE
+         * Client runs on the networking thread,
+         * therefore, the game cannot be loaded on the main thread. */
         new Thread(new Task(ctx, () -> {
             if(ctx.getGameClient() != null)
                 ctx.getGameClient().load(filename);
         })).start();
 
-        // inform user
-        Game.info(ctx, Localization.localize("browser.download_complete"));
+        /* INFORM USER
+         * If game client isn't running (null) show toast message,
+         * because download was initiated from the JS browser. */
+        if(ctx.getGameClient() == null)
+            Game.info(ctx, Localization.localize("browser.download_complete"));
     }
 
     @Override
@@ -35,7 +40,5 @@ public class DownloadReceiver extends BroadcastReceiver {
         inform(context);
         context.unregisterReceiver(this);
     }
-
-
 
 }
