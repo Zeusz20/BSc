@@ -1,7 +1,11 @@
 package com.zeusz.bsc.app.network;
 
+import android.app.Activity;
+
+import com.zeusz.bsc.app.dialog.InfoDialog;
 import com.zeusz.bsc.app.io.Dictionary;
 import com.zeusz.bsc.core.Cloud;
+import com.zeusz.bsc.core.Localization;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,6 +16,20 @@ import java.nio.charset.StandardCharsets;
 
 public final class ServerInfo {
 
+    /* Static functionality */
+    public static boolean isAvailable(Activity ctx) {
+        getInstance().fetch();
+
+        if(getInstance().info() == null) {
+            ctx.runOnUiThread(() -> {
+                new InfoDialog(ctx, Localization.localize("net.server_unavailable")).show();
+            });
+            return false;
+        }
+
+        return true;
+    }
+
     /* Singleton */
     private static final ServerInfo INSTANCE = new ServerInfo();
     public static ServerInfo getInstance() { return INSTANCE; }
@@ -21,14 +39,6 @@ public final class ServerInfo {
 
     private ServerInfo() {
         wrapper = new Dictionary[]{ null };
-
-        try {
-            // connect to server to get server info
-            Thread task = new Thread(() -> wrapJSONResponse()); // method reference doesn't work
-            task.start();
-            task.join();   // wait for task to finish
-        }
-        catch(InterruptedException e) { /* ignore */ }
     }
 
     private void wrapJSONResponse() {
@@ -43,7 +53,17 @@ public final class ServerInfo {
         }
     }
 
-    public Dictionary fetch() {
+    private void fetch() {
+        try {
+            // connect to server to get server info
+            Thread task = new Thread(() -> wrapJSONResponse()); // method reference doesn't work
+            task.start();
+            task.join();   // wait for task to finish
+        }
+        catch(InterruptedException e) { /* ignore */ }
+    }
+
+    public Dictionary info() {
         return wrapper[0];
     }
 

@@ -24,7 +24,7 @@ import java.net.URLEncoder;
 public class GameClient implements Closeable {
 
     /* Static functionality */
-    public static final Dictionary SERVER_INFO = ServerInfo.getInstance().fetch();
+    public static Dictionary SERVER_INFO;
 
     /**
      * @param state
@@ -50,11 +50,17 @@ public class GameClient implements Closeable {
     }
 
     public static void createGame(Activity ctx, Project project) {
-        launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), project.getSource().getName());
+        if(ServerInfo.isAvailable(ctx)) {
+            SERVER_INFO = ServerInfo.getInstance().info();
+            launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), project.getSource().getName());
+        }
     }
 
     public static void joinGame(Activity ctx, String id) {
-        launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
+        if(ServerInfo.isAvailable(ctx)) {
+            SERVER_INFO = ServerInfo.getInstance().info();
+            launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
+        }
     }
 
     /* Client states */

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Kérdezz! Felelek</string>
     <string name="object_image">Image of the object</string>
+    <string name="ok">OK</string>
 
     <string name="create_game">Create Game</string>
     <string name="join_game">Join Game</string>
