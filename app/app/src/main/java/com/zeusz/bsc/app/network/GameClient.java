@@ -3,9 +3,10 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.io.Dictionary;
-import com.zeusz.bsc.app.io.IOManager;
+import com.zeusz.bsc.app.ui.Dialog;
 import com.zeusz.bsc.app.ui.Game;
+import com.zeusz.bsc.app.util.Dictionary;
+import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
@@ -119,6 +120,11 @@ public class GameClient implements Closeable {
     public synchronized void parse(String response) throws Exception {
         if(response == null) return;
 
+        if(SERVER_INFO.getString("disconnect").equals(response)) {
+            ctx.destroyGameClient();
+            return;
+        }
+
         switch(state) {
             case CREATE:
             case JOIN:
@@ -141,8 +147,8 @@ public class GameClient implements Closeable {
     }
 
     /** @return The base structure of a request. */
-    protected Dictionary getMessage() throws Exception {
-        Dictionary dictionary = new Dictionary(null);
+    protected Dictionary getMessage() {
+        Dictionary dictionary = new Dictionary();
         dictionary.put("is_host", isHost);
         dictionary.put("game_id", id);
 
@@ -157,7 +163,7 @@ public class GameClient implements Closeable {
     protected void initGame(boolean isHost, String id) {
         if(id.equals(SERVER_INFO.getString("invalid"))) {
             // game doesn't exist
-            Game.info(ctx, Localization.localize("game.invalid"));
+            Dialog.toast(ctx, Localization.localize("game.invalid"));
             ctx.destroyGameClient();
         }
         else {

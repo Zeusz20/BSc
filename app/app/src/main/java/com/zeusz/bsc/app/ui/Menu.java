@@ -47,7 +47,7 @@ public final class Menu {
         MenuLayout footer = menu.findViewById(R.id.menu_footer);
 
         render(ctx, menuID, root, header, body, footer);
-        ctx.setContentView(menu);
+        ctx.runOnUiThread(() -> ctx.setContentView(menu));
     }
 
     private static void render(Activity ctx, int menuID, ConstraintLayout root, MenuLayout header, MenuLayout body, MenuLayout footer) {

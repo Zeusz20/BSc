@@ -17,6 +17,8 @@ SERVER_INFO = {
     'id_pattern': '^[A-Z0-9]{4}$',
 }
 
+_CLOSE_MESSAGES = (SERVER_INFO['disconnect'], None)
+
 
 class Server:
 
@@ -49,9 +51,32 @@ class Server:
         print('[RECV]', address, message)
         return message
 
+    def close(self, address):
+        def disconnect(game_id, player):
+            other = 'host' if player == 'join' else 'join'
+            self._clients[game_id][player]['connection'].close()
+            self._clients[game_id][player]['connection'] = None
+            self._clients[game_id][player]['address'] = None
+
+            # disconnect other player if they're still connected
+            if self._clients[game_id][other]['connection']:
+                self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
+
+        for game_id in self._clients:
+            if address == self._clients[game_id]['host']['address']:
+                disconnect(game_id, 'host')
+            elif address == self._clients[game_id]['join']['address']:
+                disconnect(game_id, 'join')
+
+            # destroy game if no player is connected
+            if self._clients[game_id]['host']['connection'] is None and self._clients[game_id]['join']['connection'] is None:
+                del self._clients[game_id]
+                print(f'[GAME] Destroyed "{game_id}" instance')
+                break
+
     def _handle_client(self, connection, address):
         try:
-            while (message := self.receive(connection, address)) != SERVER_INFO['disconnect']:
+            while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
                 if message == SERVER_INFO['create']:
                     filename = self.receive(connection, address)
                     self._create_game(connection, address, filename)
@@ -66,7 +91,7 @@ class Server:
         except JSONDecodeError or ValueError:
             pass
 
-        connection.close()
+        self.close(address)
 
     def _create_game(self, connection, address, filename):
         from string import ascii_uppercase, digits

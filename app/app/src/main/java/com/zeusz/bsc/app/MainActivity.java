@@ -27,6 +27,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCompat.requestPermissions(this, PERMISSIONS, hashCode());
         Localization.init(MainActivity.class, getFilesDir().getPath());
+    }
+
+    @Override
+    protected void onPause() {
+        destroyGameClient();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        destroyGameClient();
         Menu.show(this);
     }
 

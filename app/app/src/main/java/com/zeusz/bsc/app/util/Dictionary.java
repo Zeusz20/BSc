@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app.io;
+package com.zeusz.bsc.app.util;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +28,7 @@ public class Dictionary {
         return this;
     }
 
-    protected Object get(@NonNull String name) {
+    protected java.lang.Object get(@NonNull String name) {
         try { return json.get(name); }
         catch(JSONException e) { return null; }
     }

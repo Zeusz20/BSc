@@ -3,9 +3,8 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.dialog.InfoDialog;
+import com.zeusz.bsc.app.ui.Dialog;
 import com.zeusz.bsc.app.ui.Menu;
-import com.zeusz.bsc.core.Localization;
 
 /**
  * Wraps the Runnable class in a try-catch block.
@@ -31,9 +30,8 @@ public final class Task implements Runnable {
             target.run();
         }
         catch(Exception e) {
-            MainActivity activity = (MainActivity) ctx;
-            activity.destroyGameClient();
-            new InfoDialog(ctx, Localization.localize("net.connection_error")).show();
+            ((MainActivity) ctx).destroyGameClient();
+            Dialog.error(ctx, "net.connection_error");
             Menu.show(ctx);
         }
     }

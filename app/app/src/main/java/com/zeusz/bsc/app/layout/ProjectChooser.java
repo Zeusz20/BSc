@@ -6,8 +6,8 @@ import android.util.AttributeSet;
 import android.widget.ListView;
 
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
-import com.zeusz.bsc.app.io.IOManager;
 import com.zeusz.bsc.app.network.GameClient;
+import com.zeusz.bsc.app.util.IOManager;
 
 
 public class ProjectChooser extends ListView {

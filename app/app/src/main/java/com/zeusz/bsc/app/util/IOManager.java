@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app.io;
+package com.zeusz.bsc.app.util;
 
 import android.app.Activity;
 import android.app.DownloadManager;

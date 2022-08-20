@@ -2,10 +2,9 @@ package com.zeusz.bsc.app.network;
 
 import android.app.Activity;
 
-import com.zeusz.bsc.app.dialog.InfoDialog;
-import com.zeusz.bsc.app.io.Dictionary;
+import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.core.Cloud;
-import com.zeusz.bsc.core.Localization;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -18,12 +17,11 @@ public final class ServerInfo {
 
     /* Static functionality */
     public static boolean isAvailable(Activity ctx) {
-        getInstance().fetch();
+        if(getInstance().info() == null)
+            getInstance().fetch();
 
         if(getInstance().info() == null) {
-            ctx.runOnUiThread(() -> {
-                new InfoDialog(ctx, Localization.localize("net.server_unavailable")).show();
-            });
+            Dialog.error(ctx, "net.server_unavailable");
             return false;
         }
 

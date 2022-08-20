@@ -1,4 +1,4 @@
-package com.zeusz.bsc.app.dialog;
+package com.zeusz.bsc.app.ui;
 
 import android.content.DialogInterface.OnClickListener;
 
