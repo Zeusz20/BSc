@@ -13,11 +13,11 @@ import java.util.List;
 
 public abstract class Adapter<T> extends ArrayAdapter<T> {
 
-    protected int itemLayoutID;
+    protected int itemLayoutId;
 
-    public Adapter(Activity ctx, int itemLayoutID, List<T> items) {
-        super(ctx, itemLayoutID, items);
-        this.itemLayoutID = itemLayoutID;
+    public Adapter(Activity ctx, int itemLayoutId, List<T> items) {
+        super(ctx, itemLayoutId, items);
+        this.itemLayoutId = itemLayoutId;
     }
 
     @NonNull
@@ -25,7 +25,7 @@ public abstract class Adapter<T> extends ArrayAdapter<T> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if(convertView == null) {
             Activity ctx = (Activity) getContext();
-            convertView = ctx.getLayoutInflater().inflate(itemLayoutID, parent, false);
+            convertView = ctx.getLayoutInflater().inflate(itemLayoutId, parent, false);
         }
 
         return render(convertView, position);

@@ -2,6 +2,7 @@ package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.text.Editable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout.LayoutParams;
@@ -11,14 +12,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.layout.JSWebView;
-import com.zeusz.bsc.app.layout.JoinGameForm;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
 import com.zeusz.bsc.app.layout.ProjectChooser;
+import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.widget.BackButton;
 import com.zeusz.bsc.app.widget.Label;
 import com.zeusz.bsc.app.widget.LoadingIcon;
 import com.zeusz.bsc.app.widget.MenuButton;
+import com.zeusz.bsc.app.widget.TextInput;
 import com.zeusz.bsc.app.widget.Title;
 import com.zeusz.bsc.core.Localization;
 
@@ -28,7 +30,7 @@ public final class Menu {
     private Menu() { }
 
     public static final int MAIN_MENU = 0;
-    public static final int GAME_MENU = 1;
+    public static final int LOBBY_MENU = 1;
     public static final int PROJECTS_MENU = 2;
     public static final int OPTIONS_MENU = 3;
     public static final int DOWNLOAD_MENU = 4;
@@ -38,7 +40,7 @@ public final class Menu {
         show(ctx, MAIN_MENU);
     }
 
-    public static void show(Activity ctx, int menuID) {
+    public static void show(Activity ctx, int menuId) {
         View menu = View.inflate(ctx, R.layout.menu_layout, null);
 
         ConstraintLayout root = menu.findViewById(R.id.menu_root);
@@ -46,36 +48,39 @@ public final class Menu {
         MenuLayout body = menu.findViewById(R.id.menu_body);
         MenuLayout footer = menu.findViewById(R.id.menu_footer);
 
-        render(ctx, menuID, root, header, body, footer);
+        render(ctx, menuId, root, header, body, footer);
         ctx.runOnUiThread(() -> ctx.setContentView(menu));
     }
 
-    private static void render(Activity ctx, int menuID, ConstraintLayout root, MenuLayout header, MenuLayout body, MenuLayout footer) {
-        switch(menuID) {
+    private static void render(Activity ctx, int menuId, ConstraintLayout root, MenuLayout header, MenuLayout body, MenuLayout footer) {
+        switch(menuId) {
             case MAIN_MENU:
                 header.addView(new Title(ctx));
                 body.addViews(
-                        new MenuButton(ctx, Localization.localize("menu.new_game"), () -> show(ctx, GAME_MENU)),
+                        new MenuButton(ctx, Localization.localize("menu.create_game"), () -> show(ctx, PROJECTS_MENU)),
+                        new MenuButton(ctx, Localization.localize("menu.join_game"), () -> show(ctx, LOBBY_MENU)),
                         new MenuButton(ctx, Localization.localize("menu.download"), () -> show(ctx, DOWNLOAD_MENU)),
                         new MenuButton(ctx, Localization.localize("menu.options"), () -> show(ctx, OPTIONS_MENU))
                 );
                 footer.addView(new MenuButton(ctx, Localization.localize("menu.exit"), ctx::finish));
                 break;
 
-            case GAME_MENU:
+            case LOBBY_MENU:
                 header.addView(new Title(ctx));
                 body.addViews(
-                        new MenuButton(ctx, Localization.localize("menu.create_game"), () -> show(ctx, PROJECTS_MENU)),
-                        new MenuButton(ctx, Localization.localize("menu.join_game"), () -> {
-                            body.removeAllViews();
-                            body.addView(new JoinGameForm(ctx));
+                        new Label(ctx, Localization.localize("menu.enter_id"), 18.0f),
+                        new TextInput(ctx),
+                        new MenuButton(ctx, Localization.localize("menu.connect"), () -> {
+                            Editable raw = ((TextInput) ctx.findViewById(R.id.text_input)).getText();
+                            if(raw != null)
+                                GameClient.joinGame(ctx, raw.toString().toUpperCase());
                         })
                 );
                 footer.addView(new BackButton(ctx, MAIN_MENU));
                 break;
 
             case PROJECTS_MENU:
-                ProjectChooser chooser = new ProjectChooser(ctx);
+                ProjectChooser chooser = new ProjectChooser(ctx, false);
                 LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
                 params.setMargins(4, 0, 4, 0);
@@ -85,7 +90,7 @@ public final class Menu {
                 body.setGravity(Gravity.NO_GRAVITY);
                 body.setBackgroundColor(Color.WHITE);
                 body.addView(chooser);
-                footer.addViews(new BackButton(ctx, GAME_MENU));
+                footer.addViews(new BackButton(ctx, MAIN_MENU));
                 break;
 
             case OPTIONS_MENU:

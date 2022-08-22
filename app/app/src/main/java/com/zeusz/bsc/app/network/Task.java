@@ -30,7 +30,8 @@ public final class Task implements Runnable {
             target.run();
         }
         catch(Exception e) {
-            ((MainActivity) ctx).destroyGameClient();
+            e.printStackTrace();
+            ((MainActivity) ctx).setGameClient(null);
             Dialog.error(ctx, "net.connection_error");
             Menu.show(ctx);
         }

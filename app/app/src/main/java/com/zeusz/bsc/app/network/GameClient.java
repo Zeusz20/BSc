@@ -60,7 +60,19 @@ public class GameClient implements Closeable {
     public static void joinGame(Activity ctx, String id) {
         if(ServerInfo.isAvailable(ctx)) {
             SERVER_INFO = ServerInfo.getInstance().info();
-            launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
+            GameClient client = ((MainActivity) ctx).getGameClient();
+
+            if(client == null) {
+                launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
+            }
+            else {
+                // client is already running
+                // this is needed when the player enters a wrong game id, so the client is not destroyed and can be reused
+                new Thread(new Task(ctx, () -> {
+                    client.send(SERVER_INFO.getString("join"));
+                    client.send(id);
+                })).start();
+            }
         }
     }
 
@@ -121,7 +133,7 @@ public class GameClient implements Closeable {
         if(response == null) return;
 
         if(SERVER_INFO.getString("disconnect").equals(response)) {
-            ctx.destroyGameClient();
+            ctx.setGameClient(null);
             return;
         }
 
@@ -147,8 +159,8 @@ public class GameClient implements Closeable {
     }
 
     /** @return The base structure of a request. */
-    protected Dictionary getMessage() {
-        Dictionary dictionary = new Dictionary();
+    protected Dictionary getMessage() throws Exception {
+        Dictionary dictionary = new Dictionary(null);
         dictionary.put("is_host", isHost);
         dictionary.put("game_id", id);
 
@@ -162,17 +174,15 @@ public class GameClient implements Closeable {
      * */
     protected void initGame(boolean isHost, String id) {
         if(id.equals(SERVER_INFO.getString("invalid"))) {
-            // game doesn't exist
             Dialog.toast(ctx, Localization.localize("game.invalid"));
-            ctx.destroyGameClient();
+            return;
         }
-        else {
-            this.isHost = isHost;
-            this.id = id;
 
-            setState(isHost ? State.WAITING : State.FILE_DOWNLOAD);
-            if(isHost) game.loadingScreen(ctx);  // render waiting screen
-        }
+        this.isHost = isHost;
+        this.id = id;
+
+        setState(isHost ? State.WAITING : State.FILE_DOWNLOAD);
+        if(isHost) game.loadingScreen(ctx);  // render waiting screen
     }
 
     /**

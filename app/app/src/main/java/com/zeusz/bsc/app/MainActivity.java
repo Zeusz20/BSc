@@ -2,6 +2,7 @@ package com.zeusz.bsc.app;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,30 +32,26 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        destroyGameClient();
+        setGameClient(null);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        destroyGameClient();
         Menu.show(this);
     }
 
     @Override
     public void onBackPressed() {
-        findViewById(R.id.back_btn).callOnClick();
-    }
-
-    public void destroyGameClient() {
-        if(client != null) {
-            client.close();
-            client = null;
-        }
+        View button = findViewById(R.id.back_btn);
+        if(button != null) button.callOnClick();
     }
 
     public void setGameClient(GameClient client) {
+        if(this.client != null)
+            this.client.close();
+
         this.client = client;
     }
 
