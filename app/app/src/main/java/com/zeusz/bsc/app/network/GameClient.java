@@ -87,6 +87,8 @@ public class GameClient implements Closeable {
     protected State state;
     protected boolean isHost;
 
+    // needed this, because socket.isConnected kept running into "reader is closed" errors
+    protected boolean isConnected;
     protected Socket socket;
     protected BufferedReader reader;
     protected BufferedWriter writer;
@@ -106,16 +108,17 @@ public class GameClient implements Closeable {
     public String getId() { return id; }
 
     public void connect() throws Exception {
-        if(socket == null || !socket.isConnected()) {
+        if(!isConnected && (socket == null || !socket.isConnected())) {
             socket = new Socket(SERVER_INFO.getString("host"), SERVER_INFO.getInt("port"));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()), SERVER_INFO.getInt("buffer"));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()), SERVER_INFO.getInt("buffer"));
+            isConnected = true;
         }
     }
 
     public void listen() {
         new Thread(new Task(ctx, () -> {
-            while(socket.isConnected())
+            while(socket.isConnected() && this.isConnected)
                 parse(reader.readLine());
         })).start();
     }
@@ -228,6 +231,8 @@ public class GameClient implements Closeable {
 
     @Override
     public void close() {
+        isConnected = false;
+
         Thread disconnect = new Thread(() -> {
             try { send(SERVER_INFO.getString("disconnect")); }
             catch(Exception e) { /* couldn't connect to server */ }

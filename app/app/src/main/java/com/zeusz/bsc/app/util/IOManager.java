@@ -18,8 +18,8 @@ import java.io.ObjectInputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -67,7 +67,8 @@ public final class IOManager {
 
     public static List<File> listProjects(Activity ctx) {
         File[] files = ctx.getExternalFilesDir(PROJECT_DIR).listFiles();
-        return (files != null) ? Arrays.asList(files) : Collections.emptyList();
+        return (files != null) ? new ArrayList<>(Arrays.asList(files)) : new ArrayList<>();
+        // Arrays::asList and Collections::emptyList() return readonly lists
     }
 
     public static Project loadProjectByFilename(Activity ctx, String filename) {
