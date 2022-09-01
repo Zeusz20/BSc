@@ -24,6 +24,10 @@ public final class Game {
         ctx.runOnUiThread(() -> ctx.setContentView(R.layout.game_layout));
     }
 
+    public void exit(Activity ctx) {
+        ctx.runOnUiThread(() -> Menu.show(ctx));
+    }
+
     /** Update game state based on incoming data from the server. */
     public void update(Activity ctx, Dictionary data) {
 

@@ -80,7 +80,7 @@ public final class Menu {
                 break;
 
             case PROJECTS_MENU:
-                ProjectChooser chooser = new ProjectChooser(ctx, false);
+                ProjectChooser chooser = new ProjectChooser(ctx);
                 LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
                 params.setMargins(4, 0, 4, 0);

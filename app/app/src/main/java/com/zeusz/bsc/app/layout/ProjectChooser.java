@@ -16,7 +16,7 @@ public class ProjectChooser extends ListView {
         super(context, attrs);
     }
 
-    public ProjectChooser(Activity ctx, boolean showDelete) {
+    public ProjectChooser(Activity ctx) {
         this(ctx, (AttributeSet) null);
 
         ProjectListAdapter adapter = new ProjectListAdapter(ctx, IOManager.listProjects(ctx));

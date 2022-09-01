@@ -11,21 +11,12 @@ import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ConnectException;
-import java.net.Socket;
 import java.net.URLEncoder;
 
 
-public class GameClient implements Closeable {
+public class GameClient extends Channel {
 
     /* Static functionality */
-    public static Dictionary SERVER_INFO;
 
     /**
      * @param state
@@ -43,36 +34,29 @@ public class GameClient implements Closeable {
 
             activity.setGameClient(client);
             client.setState(state);
-            client.connect();       // connect to server
-            client.listen();        // wait for response from server
-            client.send(action);    // send intent (create/join game)
-            client.send(initial);
+            client.connect();   // connect to server
+            client.listen();    // wait for response from server
+            client.handshake(action, initial);   // send intent (create/join game) and initial message (project name/id)
         })).start();
     }
 
     public static void createGame(Activity ctx, Project project) {
-        if(ServerInfo.isAvailable(ctx)) {
-            SERVER_INFO = ServerInfo.getInstance().info();
+        if(Channel.isAvailable(ctx))
             launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), project.getSource().getName());
-        }
     }
 
     public static void joinGame(Activity ctx, String id) {
-        if(ServerInfo.isAvailable(ctx)) {
-            SERVER_INFO = ServerInfo.getInstance().info();
-            GameClient client = ((MainActivity) ctx).getGameClient();
+        if(!Channel.isAvailable(ctx)) return;
 
-            if(client == null) {
-                launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
-            }
-            else {
-                // client is already running
-                // this is needed when the player enters a wrong game id, so the client is not destroyed and can be reused
-                new Thread(new Task(ctx, () -> {
-                    client.send(SERVER_INFO.getString("join"));
-                    client.send(id);
-                })).start();
-            }
+        GameClient client = ((MainActivity) ctx).getGameClient();
+
+        if(client == null) {
+            launch(ctx, null, State.JOIN, SERVER_INFO.getString("join"), id);
+        }
+        else {
+            // client is already running
+            // this is needed when the player enters a wrong game id, so the client is not destroyed and can be reused
+            new Thread(new Task(ctx, () -> client.handshake(SERVER_INFO.getString("join"), id))).start();
         }
     }
 
@@ -80,25 +64,20 @@ public class GameClient implements Closeable {
     public enum State { CREATE, WAITING, JOIN, FILE_DOWNLOAD, IN_GAME }
 
     /* Class fields and methods */
-    private final MainActivity ctx;
     protected Game game;
 
     protected String id;
     protected State state;
     protected boolean isHost;
 
-    // needed this, because socket.isConnected kept running into "reader is closed" errors
-    protected boolean isConnected;
-    protected Socket socket;
-    protected BufferedReader reader;
-    protected BufferedWriter writer;
-
     public GameClient(Activity ctx, Project project) throws Exception {
-        if(SERVER_INFO == null)
-            throw new ConnectException("Couldn't connect to server");
-
-        this.ctx = (MainActivity) ctx;
+        super(ctx);
         this.game = new Game(project);
+    }
+
+    public void setMeta(boolean isHost, String id) {
+        this.isHost = isHost;
+        this.id = id;
     }
 
     public void setState(State state) { this.state = state; }
@@ -107,57 +86,33 @@ public class GameClient implements Closeable {
 
     public String getId() { return id; }
 
-    public void connect() throws Exception {
-        if(!isConnected && (socket == null || !socket.isConnected())) {
-            socket = new Socket(SERVER_INFO.getString("host"), SERVER_INFO.getInt("port"));
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()), SERVER_INFO.getInt("buffer"));
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()), SERVER_INFO.getInt("buffer"));
-            isConnected = true;
-        }
-    }
-
-    public void listen() {
-        new Thread(new Task(ctx, () -> {
-            while(socket.isConnected() && this.isConnected)
-                parse(reader.readLine());
-        })).start();
-    }
-
-    public void send(String message) throws Exception {
-        writer.write(message);
-        writer.newLine();
-        writer.flush();
-
-        // wait for server to process sent message before client can send another one
-        Thread.sleep(10);
-    }
-
-    public synchronized void parse(String response) throws Exception {
+    @Override
+    public void parse(String response) throws Exception {
         if(response == null) return;
 
         if(SERVER_INFO.getString("disconnect").equals(response)) {
             ctx.setGameClient(null);
+            game.exit(ctx);
             return;
         }
 
-        switch(state) {
-            case CREATE:
-            case JOIN:
-                // the activity which creates the game is the host
-                initGame((state == State.CREATE), response);
-                break;
-
-            case WAITING:
-                waitForPlayer(response);
-                break;
-
-            case FILE_DOWNLOAD:
-                downloadProject(response);
-                break;
-
-            case IN_GAME:
-                game.update(ctx, new Dictionary(response));
-                break;
+        synchronized(Channel.LOCK) {
+            switch(state) {
+                case CREATE:
+                case JOIN:
+                    // the activity which creates the game is the host
+                    initGame((state == State.CREATE), response);
+                    break;
+                case WAITING:
+                    waitForPlayer(response);
+                    break;
+                case FILE_DOWNLOAD:
+                    downloadProject(response);
+                    break;
+                case IN_GAME:
+                    game.update(ctx, new Dictionary(response));
+                    break;
+            }
         }
     }
 
@@ -181,11 +136,12 @@ public class GameClient implements Closeable {
             return;
         }
 
-        this.isHost = isHost;
-        this.id = id;
-
+        setMeta(isHost, id);
         setState(isHost ? State.WAITING : State.FILE_DOWNLOAD);
-        if(isHost) game.loadingScreen(ctx);  // render waiting screen
+
+        // render waiting screen
+        if(isHost)
+            game.loadingScreen(ctx);
     }
 
     /**
@@ -227,36 +183,6 @@ public class GameClient implements Closeable {
 
         setState(State.IN_GAME);
         game.start(ctx);
-    }
-
-    @Override
-    public void close() {
-        isConnected = false;
-
-        Thread disconnect = new Thread(() -> {
-            try { send(SERVER_INFO.getString("disconnect")); }
-            catch(Exception e) { /* couldn't connect to server */ }
-        });
-
-        try {
-            // disconnect from server
-            disconnect.start();
-            disconnect.join();
-        }
-        catch(Exception e) {
-            // couldn't disconnect cleanly from the server
-        }
-        finally {
-            try {
-                // close channels
-                if(reader != null) reader.close();
-                if(writer != null) writer.close();
-                if(socket != null) socket.close();
-            }
-            catch(IOException e) {
-                // couldn't close channels
-            }
-        }
     }
 
 }
