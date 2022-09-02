@@ -2,14 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/menu_root"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_red_dark"
     android:padding="8dp">
 
     <com.zeusz.bsc.app.layout.MenuLayout
-        android:id="@+id/menu_header"
+        android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -20,18 +20,18 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.zeusz.bsc.app.layout.MenuLayout
-        android:id="@+id/menu_body"
+        android:id="@+id/body_layout"
         android:layout_width="match_parent"
         android:layout_height="680dp"
         android:orientation="vertical"
         android:gravity="center"
-        app:layout_constraintBottom_toTopOf="@+id/menu_footer"
+        app:layout_constraintBottom_toTopOf="@+id/footer_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/menu_header" />
+        app:layout_constraintTop_toBottomOf="@+id/header_layout" />
 
     <com.zeusz.bsc.app.layout.MenuLayout
-        android:id="@+id/menu_footer"
+        android:id="@+id/footer_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"

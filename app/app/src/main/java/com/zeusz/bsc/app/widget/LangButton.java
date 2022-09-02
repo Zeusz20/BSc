@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.zeusz.bsc.app.ui.Menu;
+import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Localization;
 
 import java.util.Locale;
@@ -19,7 +19,7 @@ public class LangButton extends MenuButton {
     public LangButton(Activity ctx, Locale locale) {
         super(ctx, locale.getDisplayLanguage(locale), () -> {
             Localization.load(locale);
-            Menu.show(ctx);
+            ViewManager.show(ctx, ViewManager.MAIN_MENU);
         });
     }
 

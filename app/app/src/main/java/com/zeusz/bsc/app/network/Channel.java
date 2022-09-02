@@ -4,7 +4,6 @@ import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.ui.Dialog;
-import com.zeusz.bsc.app.ui.Menu;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.core.Cloud;
 
@@ -63,7 +62,8 @@ public abstract class Channel implements Closeable {
     /* Class fields and methods */
     protected final MainActivity ctx;
 
-    private boolean isConnected;
+    protected boolean isConnected;
+
     private Socket socket;
     private BufferedReader reader;
     private BufferedWriter writer;
@@ -81,6 +81,28 @@ public abstract class Channel implements Closeable {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()), SERVER_INFO.getInt("buffer"));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()), SERVER_INFO.getInt("buffer"));
             isConnected = true;
+        }
+    }
+
+    public void disconnect() {
+        isConnected = false;
+
+        Thread closeConnection = new Thread(() -> {
+            try { send(SERVER_INFO.getString("disconnect")); }
+            catch(Exception e) { /* couldn't connect to server */ }
+        });
+
+        try {
+            // disconnect from server
+            closeConnection.start();
+            closeConnection.join();
+        }
+        catch(InterruptedException e) {
+            // couldn't disconnect cleanly from the server
+        }
+        finally {
+            try { close(); }
+            catch(IOException e) { /* couldn't close channels */ }
         }
     }
 
@@ -108,33 +130,10 @@ public abstract class Channel implements Closeable {
     public abstract void parse(String response) throws Exception;
 
     @Override
-    public void close() {
-        isConnected = false;
-
-        Thread disconnect = new Thread(() -> {
-            try { send(SERVER_INFO.getString("disconnect")); }
-            catch(Exception e) { /* couldn't connect to server */ }
-        });
-
-        try {
-            // disconnect from server
-            disconnect.start();
-            disconnect.join();
-        }
-        catch(Exception e) {
-            // couldn't disconnect cleanly from the server
-        }
-        finally {
-            try {
-                // close channels
-                if(reader != null) reader.close();
-                if(writer != null) writer.close();
-                if(socket != null) socket.close();
-            }
-            catch(IOException e) {
-                // couldn't close channels
-            }
-        }
+    public void close() throws IOException {
+        if(reader != null) reader.close();
+        if(writer != null) writer.close();
+        if(socket != null) socket.close();
     }
 
 }

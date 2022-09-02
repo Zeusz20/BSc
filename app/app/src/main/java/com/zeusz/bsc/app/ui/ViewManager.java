@@ -25,30 +25,26 @@ import com.zeusz.bsc.app.widget.Title;
 import com.zeusz.bsc.core.Localization;
 
 
-public final class Menu {
+public final class ViewManager {
 
-    private Menu() { }
+    private ViewManager() { }
 
     public static final int MAIN_MENU = 0;
     public static final int LOBBY_MENU = 1;
     public static final int PROJECTS_MENU = 2;
     public static final int OPTIONS_MENU = 3;
     public static final int DOWNLOAD_MENU = 4;
-    public static final int WAITING_FOR_PLAYER = 5;
+    public static final int LOADING_SCREEN = 5;
 
-    public static void show(Activity ctx) {
-        show(ctx, MAIN_MENU);
-    }
+    public static void show(Activity ctx, int layoutId) {
+        View menu = View.inflate(ctx, R.layout.base_layout, null);
 
-    public static void show(Activity ctx, int menuId) {
-        View menu = View.inflate(ctx, R.layout.menu_layout, null);
+        ConstraintLayout root = menu.findViewById(R.id.root_layout);
+        MenuLayout header = menu.findViewById(R.id.header_layout);
+        MenuLayout body = menu.findViewById(R.id.body_layout);
+        MenuLayout footer = menu.findViewById(R.id.footer_layout);
 
-        ConstraintLayout root = menu.findViewById(R.id.menu_root);
-        MenuLayout header = menu.findViewById(R.id.menu_header);
-        MenuLayout body = menu.findViewById(R.id.menu_body);
-        MenuLayout footer = menu.findViewById(R.id.menu_footer);
-
-        render(ctx, menuId, root, header, body, footer);
+        render(ctx, layoutId, root, header, body, footer);
         ctx.runOnUiThread(() -> ctx.setContentView(menu));
     }
 
@@ -107,7 +103,7 @@ public final class Menu {
                 footer.addView(new BackButton(ctx, MAIN_MENU));
                 break;
 
-            case WAITING_FOR_PLAYER:
+            case LOADING_SCREEN:
                 MainActivity activity = (MainActivity) ctx;
 
                 header.addViews(
@@ -118,7 +114,7 @@ public final class Menu {
                         new Label(ctx, Localization.localize("game.waiting_for_player")),
                         new LoadingIcon(ctx)
                 );
-                footer.addView(new BackButton(ctx, PROJECTS_MENU));
+                footer.addView(new BackButton(ctx, PROJECTS_MENU, "word.cancel"));
                 break;
         }
     }

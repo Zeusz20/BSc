@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.ui.Dialog;
-import com.zeusz.bsc.app.ui.Menu;
+import com.zeusz.bsc.app.ui.ViewManager;
 
 /**
  * Wraps the Runnable class in a try-catch block.
@@ -33,7 +33,7 @@ public final class Task implements Runnable {
             e.printStackTrace();
             ((MainActivity) ctx).setGameClient(null);
             Dialog.error(ctx, "net.connection_error");
-            Menu.show(ctx);
+            ViewManager.show(ctx, ViewManager.MAIN_MENU);
         }
     }
 

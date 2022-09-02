@@ -17,15 +17,16 @@ public final class Game {
     }
 
     public void loadingScreen(Activity ctx) {
-        ctx.runOnUiThread(() -> Menu.show(ctx, Menu.WAITING_FOR_PLAYER));
+        ctx.runOnUiThread(() -> ViewManager.show(ctx, ViewManager.LOADING_SCREEN));
     }
 
     public void start(Activity ctx) {
         ctx.runOnUiThread(() -> ctx.setContentView(R.layout.game_layout));
     }
 
-    public void exit(Activity ctx) {
-        ctx.runOnUiThread(() -> Menu.show(ctx));
+    public void exit(Activity ctx, boolean isDirty) {
+        ctx.runOnUiThread(() -> ViewManager.show(ctx, ViewManager.MAIN_MENU));
+        if(isDirty) Dialog.error(ctx, "game.player_disconnected");
     }
 
     /** Update game state based on incoming data from the server. */

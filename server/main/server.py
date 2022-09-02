@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-from json import JSONDecodeError, loads
+from json import loads
 
 SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
@@ -75,21 +75,18 @@ class Server:
                 break
 
     def _handle_client(self, connection, address):
-        try:
-            while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
-                if message == SERVER_INFO['create']:
-                    filename = self.receive(connection, address)
-                    self._create_game(connection, address, filename)
-                elif message == SERVER_INFO['join']:
-                    game_id = self.receive(connection, address).upper()
-                    self._join_game(connection, address, game_id)
-                elif message == SERVER_INFO['ready']:
-                    game_id = self.receive(connection, address).upper()
-                    self._start_game(game_id)
-                else:
-                    self._communicate(loads(message))
-        except JSONDecodeError or ValueError:
-            pass
+        while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
+            if message == SERVER_INFO['create']:
+                filename = self.receive(connection, address)
+                self._create_game(connection, address, filename)
+            elif message == SERVER_INFO['join']:
+                game_id = self.receive(connection, address).upper()
+                self._join_game(connection, address, game_id)
+            elif message == SERVER_INFO['ready']:
+                game_id = self.receive(connection, address).upper()
+                self._start_game(game_id)
+            else:
+                self._communicate(loads(message))
 
         self.close(address)
 
@@ -134,13 +131,7 @@ class Server:
     def _communicate(self, message):
         game_id = message.get('game_id')
         is_host = message.get('is_host')
-        client = 'host' if is_host else 'join'
+        other = 'host' if is_host else 'join'
 
         if self._clients.get(game_id):
-            if message.get('disconnect'):
-                # inform other player about leaving and destroy the game
-                other = 'join' if is_host else 'host'
-                self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
-                del self._clients[game_id]
-            else:
-                self.send(self._clients[game_id][client]['connection'], self._clients[game_id][client]['address'], message)
+            self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], message)

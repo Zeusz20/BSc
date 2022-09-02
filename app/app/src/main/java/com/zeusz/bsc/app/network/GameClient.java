@@ -36,7 +36,7 @@ public class GameClient extends Channel {
             client.setState(state);
             client.connect();   // connect to server
             client.listen();    // wait for response from server
-            client.handshake(action, initial);   // send intent (create/join game) and initial message (project name/id)
+            client.handshake(action, initial);   // send intent (create/join game) and initial message (project name/game id)
         })).start();
     }
 
@@ -61,7 +61,7 @@ public class GameClient extends Channel {
     }
 
     /* Client states */
-    public enum State { CREATE, WAITING, JOIN, FILE_DOWNLOAD, IN_GAME }
+    public enum State { CREATE, WAITING, JOIN, FILE_DOWNLOAD, IN_GAME, EXIT }
 
     /* Class fields and methods */
     protected Game game;
@@ -86,32 +86,34 @@ public class GameClient extends Channel {
 
     public String getId() { return id; }
 
+    public boolean isDirty() { return state != State.EXIT; }
+
     @Override
     public void parse(String response) throws Exception {
-        if(response == null) return;
-
-        if(SERVER_INFO.getString("disconnect").equals(response)) {
-            ctx.setGameClient(null);
-            game.exit(ctx);
-            return;
-        }
-
         synchronized(Channel.LOCK) {
-            switch(state) {
-                case CREATE:
-                case JOIN:
-                    // the activity which creates the game is the host
-                    initGame((state == State.CREATE), response);
-                    break;
-                case WAITING:
-                    waitForPlayer(response);
-                    break;
-                case FILE_DOWNLOAD:
-                    downloadProject(response);
-                    break;
-                case IN_GAME:
-                    game.update(ctx, new Dictionary(response));
-                    break;
+            if(response == null) return;
+
+            if(SERVER_INFO.getString("disconnect").equals(response)) {
+                ctx.setGameClient(null);
+                game.exit(ctx, isDirty());
+            }
+            else {
+                switch(state) {
+                    case CREATE:
+                    case JOIN:
+                        // the activity which creates the game is the host
+                        init((state == State.CREATE), response);
+                        break;
+                    case WAITING:
+                        wait(response);
+                        break;
+                    case FILE_DOWNLOAD:
+                        download(response);
+                        break;
+                    case IN_GAME:
+                        game.update(ctx, new Dictionary(response));
+                        break;
+                }
             }
         }
     }
@@ -130,7 +132,7 @@ public class GameClient extends Channel {
      * After initialization the host is put to the WAITING state, while the
      * joining player is put in the FILE_DOWNLOAD state.
      * */
-    protected void initGame(boolean isHost, String id) {
+    protected void init(boolean isHost, String id) {
         if(id.equals(SERVER_INFO.getString("invalid"))) {
             Dialog.toast(ctx, Localization.localize("game.invalid"));
             return;
@@ -149,7 +151,7 @@ public class GameClient extends Channel {
      * download the project file (if not present on their machine).
      * The connection is established when the server sends the "ready" response.
      * */
-    protected void waitForPlayer(String response) throws Exception {
+    protected void wait(String response) throws Exception {
         if(SERVER_INFO.getString("ready").equals(response))
             load(null);  // start game
     }
@@ -160,7 +162,7 @@ public class GameClient extends Channel {
      * {@link #load(String)} method will load the project and the client's
      * state will be changed to IN_GAME.
      * */
-    protected void downloadProject(String filename) throws Exception {
+    protected void download(String filename) throws Exception {
         if(!isHost) {
             String encoded = URLEncoder.encode(filename, SERVER_INFO.getString("format"));
             String url = Cloud.getCloudUrl("/projects/" + encoded);
