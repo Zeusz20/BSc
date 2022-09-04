@@ -31,9 +31,9 @@ public class SideMenu extends VBox implements Drawable {
 
         objectTab = new Tab(Object.class, Localization.localize("side.objects"));
         attributeTab = new Tab(Attribute.class, Localization.localize("side.attributes"));
-        questionTab = new Tab(Question.class, Localization.localize("side.questions"));
+        //questionTab = new Tab(Question.class, Localization.localize("side.questions"));
 
-        getChildren().addAll(objectTab, attributeTab, questionTab);
+        getChildren().addAll(objectTab, attributeTab/*,  questionTab*/);
     }
 
     public Tab getTabByType(Class<? extends Item> type) {
@@ -47,7 +47,7 @@ public class SideMenu extends VBox implements Drawable {
     public void draw() {
         objectTab.draw();
         attributeTab.draw();
-        questionTab.draw();
+        //questionTab.draw();
     }
 
 }

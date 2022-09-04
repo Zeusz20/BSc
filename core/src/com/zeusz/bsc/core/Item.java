@@ -20,4 +20,9 @@ public abstract class Item extends GWObject {
         return name;
     }
 
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        return (obj instanceof Item) && ((Item) obj).getName().equals(name);
+    }
+
 }

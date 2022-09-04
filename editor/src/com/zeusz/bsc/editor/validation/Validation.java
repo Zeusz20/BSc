@@ -1,7 +1,7 @@
 package com.zeusz.bsc.editor.validation;
 
-import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.core.Object;
+import com.zeusz.bsc.core.*;
 import com.zeusz.bsc.editor.Editor;
 
 import java.util.List;
@@ -107,6 +107,20 @@ public class Validation {
 
     private static Validation validateAttribute(Attribute attribute) {
         Validation validation = validateItem(attribute);
+        final String PATTERN = "{$attr}";
+
+        // question must contain "{$attr}" so it can be substituted with the attributes value
+        if(attribute.getQuestion().contains(PATTERN)) {
+            // check if pattern occurs ONLY ONCE
+            int substringIndex = attribute.getQuestion().indexOf(PATTERN) + PATTERN.length();
+
+            if(attribute.getQuestion().substring(substringIndex).contains(PATTERN))
+                validation.getErrors().add(Localization.localize("error.too_many_attr_references"));
+        }
+        else {
+            validation.getErrors().add(Localization.localize("error.missing_attr_reference"));
+        }
+
 
         // attribute has to have at least 1 value
         if(attribute.getValues().isEmpty())

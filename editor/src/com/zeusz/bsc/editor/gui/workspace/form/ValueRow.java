@@ -27,6 +27,10 @@ public class ValueRow extends Row {
                 parent.getChildren().remove(this);
                 new ValueDeleteEvent(valueField.getText()).fire();
             }
+            else {
+                // delete last value's text
+                valueField.setText("");
+            }
         });
 
         super.init(prompt, valueField, deleteValueBtn);
