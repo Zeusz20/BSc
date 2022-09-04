@@ -5,13 +5,16 @@ import android.app.Activity;
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.ui.Game;
+import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
+import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
 
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 
 public class GameClient extends Channel {
@@ -45,7 +48,8 @@ public class GameClient extends Channel {
     }
 
     public static void joinGame(Activity ctx, String id) {
-        if(!Channel.isAvailable(ctx)) return;
+        if(!Channel.isAvailable(ctx) || !Pattern.matches(SERVER_INFO.getString("id_pattern"), id))
+            return;
 
         GameClient client = ((MainActivity) ctx).getGameClient();
 
@@ -64,6 +68,7 @@ public class GameClient extends Channel {
 
     /* Class fields and methods */
     protected Game game;
+    protected boolean opponentReady;
 
     protected String id;
     protected State state;
@@ -72,11 +77,12 @@ public class GameClient extends Channel {
     public GameClient(Activity ctx, Project project) throws Exception {
         super(ctx);
         this.game = new Game(project);
+        this.opponentReady = false;
     }
 
     public void setMeta(boolean isHost, String id) {
         this.isHost = isHost;
-        this.id = id;
+        this.id = id.toUpperCase();
     }
 
     public void setState(State state) { this.state = state; }
@@ -88,6 +94,21 @@ public class GameClient extends Channel {
     public Game getGame() { return game; }
 
     public boolean isDirty() { return state != State.EXIT; }
+
+    public void selectObject(Object object) {
+        game.setObject(object);
+
+        try {
+            // player has chosen an object, inform opponent about it
+            Thread objectSelection = new Thread(new Task(ctx, () -> handshake(SERVER_INFO.getString("ready"), id)));
+            objectSelection.start();
+            objectSelection.join();
+        }
+        catch(Exception e) { ctx.setGameClient(null); }
+
+        // wait for other player to choose an object
+        game.show(ctx, opponentReady ? ViewManager.GAME_SCREEN : ViewManager.LOADING_SCREEN);
+    }
 
     @Override
     public void parse(String response) throws Exception {
@@ -112,7 +133,7 @@ public class GameClient extends Channel {
                         download(response);
                         break;
                     case IN_GAME:
-                        game.update(ctx, new Dictionary(response));
+                        update(response);
                         break;
                 }
             }
@@ -144,7 +165,7 @@ public class GameClient extends Channel {
 
         // render waiting screen
         if(isHost)
-            game.loadingScreen(ctx);
+            game.show(ctx, ViewManager.LOADING_SCREEN);
     }
 
     /**
@@ -185,7 +206,27 @@ public class GameClient extends Channel {
         }
 
         setState(State.IN_GAME);
-        game.start(ctx);
+        game.show(ctx, ViewManager.OBJECT_SELECTION);
+    }
+
+    /**
+     * While in the IN_GAME state wait for other player to choose their object.
+     * If the object is already chosen, handle JSON response from the server.
+     * */
+    protected void update(String response) throws Exception {
+        if(SERVER_INFO.getString("ready").equals(response)) {
+            // dismiss loading screen because opponent has chosen an object
+            // (at the beginning of the game)
+            opponentReady = true;
+
+            // player has already chosen an object (not opponent)
+            if(game.getObject() != null)
+                game.show(ctx, ViewManager.GAME_SCREEN);
+        }
+        else {
+            // update game state
+            game.update(ctx, new Dictionary(response));
+        }
     }
 
 }

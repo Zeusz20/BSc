@@ -7,7 +7,6 @@ import android.widget.ListView;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.adapter.ObjectListAdapter;
-import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Object;
 
 import java.util.List;
@@ -25,8 +24,7 @@ public class ObjectChooser extends ListView {
         setClickable(true);
         setOnItemClickListener((parent, view, position, id) -> {
             Object object = (Object) getItemAtPosition(position);
-            ((MainActivity) ctx).getGameClient().getGame().selectObject(object);
-            ViewManager.show(ctx, ViewManager.GAME_SCREEN);
+            ((MainActivity) ctx).getGameClient().selectObject(object);
         });
     }
 

@@ -21,21 +21,15 @@ public final class Game {
         project = IOManager.loadProjectByFilename(ctx, filename);
     }
 
-    public void selectObject(Object object) {
-        this.object = object;
-    }
-
-    public void loadingScreen(Activity ctx) {
-        ctx.runOnUiThread(() -> ViewManager.show(ctx, ViewManager.LOADING_SCREEN));
-    }
-
-    public void start(Activity ctx) {
-        ctx.runOnUiThread(() -> ViewManager.show(ctx, ViewManager.OBJECT_SELECTION));
+    public void show(Activity ctx, int screenId) {
+        ctx.runOnUiThread(() -> ViewManager.show(ctx, screenId));
     }
 
     public void exit(Activity ctx, boolean isDirty) {
-        ctx.runOnUiThread(() -> ViewManager.show(ctx, ViewManager.MAIN_MENU));
-        if(isDirty) DialogBuilder.error(ctx, "game.player_disconnected");
+        ctx.runOnUiThread(() -> {
+            ViewManager.show(ctx, ViewManager.MAIN_MENU);
+            if(isDirty) DialogBuilder.error(ctx, "game.player_disconnected");
+        });
     }
 
     /** Update game state based on incoming data from the server. */
@@ -46,5 +40,7 @@ public final class Game {
     public Project getProject() { return project; }
 
     public Object getObject() { return object; }
+
+    public void setObject(Object object) { this.object = object; }
 
 }

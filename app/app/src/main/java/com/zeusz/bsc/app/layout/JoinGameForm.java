@@ -13,12 +13,8 @@ import com.zeusz.bsc.app.widget.MenuButton;
 import com.zeusz.bsc.app.widget.TextInput;
 import com.zeusz.bsc.core.Localization;
 
-import java.util.regex.Pattern;
-
 
 public class JoinGameForm extends MenuLayout {
-
-    public static final String PLAYER_ID_PATTERN = "^[0-9A-Z]{4}$";
 
     public JoinGameForm(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -37,10 +33,7 @@ public class JoinGameForm extends MenuLayout {
 
             if(raw != null) {
                 String id = raw.toString().toUpperCase();
-
-                // connect to game
-                if(Pattern.matches(PLAYER_ID_PATTERN, id))
-                    GameClient.joinGame(ctx, id);
+                GameClient.joinGame(ctx, id);
             }
         }));
     }

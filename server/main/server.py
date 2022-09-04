@@ -1,6 +1,5 @@
-import socket
+import json, socket
 from threading import Thread
-from json import loads
 
 SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
@@ -17,7 +16,7 @@ SERVER_INFO = {
     'id_pattern': '^[A-Z0-9]{4}$',
 }
 
-_CLOSE_MESSAGES = (SERVER_INFO['disconnect'], None)
+_CLOSE_MESSAGES = (SERVER_INFO['disconnect'], '', None)
 
 
 class Server:
@@ -76,17 +75,21 @@ class Server:
 
     def _handle_client(self, connection, address):
         while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
-            if message == SERVER_INFO['create']:
-                filename = self.receive(connection, address)
-                self._create_game(connection, address, filename)
-            elif message == SERVER_INFO['join']:
-                game_id = self.receive(connection, address).upper()
-                self._join_game(connection, address, game_id)
-            elif message == SERVER_INFO['ready']:
-                game_id = self.receive(connection, address).upper()
-                self._start_game(game_id)
-            else:
-                self._communicate(loads(message))
+            try:
+                if message == SERVER_INFO['create']:
+                    filename = self.receive(connection, address)
+                    self._create_game(connection, address, filename)
+                elif message == SERVER_INFO['join']:
+                    game_id = self.receive(connection, address)
+                    self._join_game(connection, address, game_id)
+                elif message == SERVER_INFO['ready']:
+                    game_id = self.receive(connection, address)
+                    self._start_game(address, game_id)
+                else:
+                    self._communicate(json.loads(message))
+            
+            except json.JSONDecodeError:
+                pass
 
         self.close(address)
 
@@ -125,13 +128,14 @@ class Server:
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], game_id)
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], project)
 
-    def _start_game(self, game_id):
-        self.send(self._clients[game_id]['host']['connection'], self._clients[game_id]['host']['address'], SERVER_INFO['ready'])
+    def _start_game(self, address, game_id):
+        other = 'host' if self._clients[game_id]['join']['address'] == address else 'join'
+        self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['ready'])
 
     def _communicate(self, message):
         game_id = message.get('game_id')
         is_host = message.get('is_host')
-        other = 'host' if is_host else 'join'
+        other = 'join' if is_host else 'host'
 
         if self._clients.get(game_id):
-            self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], message)
+            self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], json.dumps(message))
