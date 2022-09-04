@@ -48,7 +48,12 @@ public class AttributePane extends Workspace<Attribute> {
 
         label.setFont(Style.FONT_SMALL);
         addBtn.setOnAction(event -> valueList.addRow(new ValueRow(valueList, "")));
-        item.getValues().forEach(it -> valueList.addRow(new ValueRow(valueList, it)));  // populate valueList
+
+        // populate valueList
+        for(String value: item.getValues())
+            valueList.addRow(new ValueRow(valueList, value));
+
+        //item.getValues().forEach(it -> valueList.addRow(new ValueRow(valueList, it)));  // this throws a ConcurrentModificationException
         fields.add(valueList);
 
         return new Box(new Row(label, addBtn), valueList);

@@ -26,8 +26,8 @@ public class Validation {
         if(object instanceof Attribute)
             return validateAttribute((Attribute) object);
 
-        if(object instanceof Question)
-            return validateQuestion((Question) object);
+        /*if(object instanceof Question)
+            return validateQuestion((Question) object);*/
 
         return result;
     }
@@ -54,7 +54,7 @@ public class Validation {
             validation.getErrors().add(Localization.localize("error.few_attributes"));
 
         // each attribute is assigned to a question (1 to n)
-        for(Attribute attribute: attributes) {
+        /*for(Attribute attribute: attributes) {
             int i;
             for(i = 0; i < questions.size(); i++) {
                 if(attribute.equals(questions.get(i).getAttribute()))
@@ -65,7 +65,7 @@ public class Validation {
                 validation.getErrors().add(Localization.localize("error.unused_attributes"));
                 break;
             }
-        }
+        }*/
 
         // validate items
         if(!(areItemsValid.test(objects) && areItemsValid.test(attributes) && areItemsValid.test(questions)))
