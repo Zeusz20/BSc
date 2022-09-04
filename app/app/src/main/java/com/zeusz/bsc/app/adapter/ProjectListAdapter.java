@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zeusz.bsc.app.R;
-import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
@@ -38,14 +38,14 @@ public class ProjectListAdapter extends Adapter<File> {
 
             nameView.setText(name);
             descriptionView.setText(description);
-            authorView.setText(String.format("%s: %s", Localization.prompt("project.author"), author)); // couldn't concat strings, had to use format
+            authorView.setText(String.format("%s %s", Localization.prompt("project.author"), author)); // couldn't concat strings, had to use format
 
             // add file info and functionality
             TextView dateView = view.findViewById(R.id.project_date);
             ImageView deleteBtn = view.findViewById(R.id.delete_button);
 
             dateView.setText(new java.sql.Date(file.lastModified()).toString());
-            deleteBtn.setOnClickListener(listener -> Dialog.warning(this, project));
+            deleteBtn.setOnClickListener(listener -> DialogBuilder.delete(this, project));
         }
 
         return view;

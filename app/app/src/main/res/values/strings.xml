@@ -2,10 +2,6 @@
     <string name="app_name">Kérdezz! Felelek</string>
     <string name="object_image">Image of the object</string>
     <string name="delete_btn_image">Image of a bin</string>
+    <string name="info_btn_image">Image of the letter i</string>
     <string name="ok">OK</string>
-
-    <string name="create_game">Create Game</string>
-    <string name="join_game">Join Game</string>
-    <string name="send_data">Send Data</string>
-    <string name="disconnect">Disconnect</string>
 </resources>

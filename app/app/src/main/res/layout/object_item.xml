@@ -3,13 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/object_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/object_image" />
+        android:contentDescription="@string/object_image"
+        android:maxWidth="64dp"
+        android:maxHeight="64dp"
+        android:adjustViewBounds="true" />
 
     <TextView
         android:id="@+id/object_name"

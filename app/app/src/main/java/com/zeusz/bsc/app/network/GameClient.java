@@ -3,7 +3,7 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
@@ -16,7 +16,7 @@ import java.net.URLEncoder;
 
 public class GameClient extends Channel {
 
-    /* Static functionality */
+    /* Static functionalities */
 
     /**
      * @param state
@@ -29,10 +29,9 @@ public class GameClient extends Channel {
      * */
     private static void launch(Activity ctx, Project project, State state, String action, String initial) {
         new Thread(new Task(ctx, () -> {
-            MainActivity activity = (MainActivity) ctx;
             GameClient client = new GameClient(ctx, project);
 
-            activity.setGameClient(client);
+            ((MainActivity) ctx).setGameClient(client);
             client.setState(state);
             client.connect();   // connect to server
             client.listen();    // wait for response from server
@@ -86,6 +85,8 @@ public class GameClient extends Channel {
 
     public String getId() { return id; }
 
+    public Game getGame() { return game; }
+
     public boolean isDirty() { return state != State.EXIT; }
 
     @Override
@@ -134,7 +135,7 @@ public class GameClient extends Channel {
      * */
     protected void init(boolean isHost, String id) {
         if(id.equals(SERVER_INFO.getString("invalid"))) {
-            Dialog.toast(ctx, Localization.localize("game.invalid"));
+            DialogBuilder.toast(ctx, Localization.localize("game.invalid"));
             return;
         }
 

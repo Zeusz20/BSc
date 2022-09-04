@@ -3,7 +3,7 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.core.Cloud;
 
@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class Channel implements Closeable {
 
-    /* Static functionality */
+    /* Static functionalities */
     protected static final java.lang.Object LOCK = new java.lang.Object();
 
     protected static Dictionary SERVER_INFO;
@@ -31,7 +31,7 @@ public abstract class Channel implements Closeable {
         if(SERVER_INFO == null) Channel.fetch();
 
         if(SERVER_INFO == null) {
-            Dialog.error(ctx, "net.server_unavailable");
+            DialogBuilder.error(ctx, "net.server_unavailable");
             return false;
         }
 

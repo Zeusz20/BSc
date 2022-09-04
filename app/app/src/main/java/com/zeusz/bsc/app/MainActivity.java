@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.zeusz.bsc.app.network.GameClient;
-import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Localization;
 
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         if(client != null && client.isDirty())
-            Dialog.error(this, "game.player_disconnected");
+            DialogBuilder.error(this, "game.player_disconnected");
 
         setGameClient(null);
         super.onPause();

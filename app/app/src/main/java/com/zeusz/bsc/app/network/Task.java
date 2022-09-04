@@ -3,7 +3,7 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.Dialog;
+import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.ui.ViewManager;
 
 /**
@@ -32,7 +32,7 @@ public final class Task implements Runnable {
         catch(Exception e) {
             e.printStackTrace();
             ((MainActivity) ctx).setGameClient(null);
-            Dialog.error(ctx, "net.connection_error");
+            DialogBuilder.error(ctx, "net.connection_error");
             ViewManager.show(ctx, ViewManager.MAIN_MENU);
         }
     }

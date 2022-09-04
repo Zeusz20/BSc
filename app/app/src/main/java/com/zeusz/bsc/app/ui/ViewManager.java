@@ -5,7 +5,9 @@ import android.graphics.Color;
 import android.text.Editable;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -14,15 +16,22 @@ import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
+import com.zeusz.bsc.app.layout.ObjectChooser;
 import com.zeusz.bsc.app.layout.ProjectChooser;
 import com.zeusz.bsc.app.network.GameClient;
+import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.app.widget.BackButton;
+import com.zeusz.bsc.app.widget.ConcedeButton;
 import com.zeusz.bsc.app.widget.Label;
 import com.zeusz.bsc.app.widget.LoadingIcon;
 import com.zeusz.bsc.app.widget.MenuButton;
 import com.zeusz.bsc.app.widget.TextInput;
 import com.zeusz.bsc.app.widget.Title;
 import com.zeusz.bsc.core.Localization;
+import com.zeusz.bsc.core.Object;
+import com.zeusz.bsc.core.Project;
+
+import java.util.List;
 
 
 public final class ViewManager {
@@ -35,6 +44,8 @@ public final class ViewManager {
     public static final int OPTIONS_MENU = 3;
     public static final int DOWNLOAD_MENU = 4;
     public static final int LOADING_SCREEN = 5;
+    public static final int OBJECT_SELECTION = 6;
+    public static final int GAME_SCREEN = 7;
 
     public static void show(Activity ctx, int layoutId) {
         View menu = View.inflate(ctx, R.layout.base_layout, null);
@@ -104,11 +115,9 @@ public final class ViewManager {
                 break;
 
             case LOADING_SCREEN:
-                MainActivity activity = (MainActivity) ctx;
-
                 header.addViews(
                         new Label(ctx, Localization.localize("game.your_id")),
-                        new Label(ctx, activity.getGameClient().getId(), 48.0f)
+                        new Label(ctx, ((MainActivity) ctx).getGameClient().getId(), 48.0f)
                 );
                 body.addViews(
                         new Label(ctx, Localization.localize("game.waiting_for_player")),
@@ -116,7 +125,41 @@ public final class ViewManager {
                 );
                 footer.addView(new BackButton(ctx, PROJECTS_MENU, "word.cancel"));
                 break;
+
+            case OBJECT_SELECTION:
+                List<Object> objects = ((MainActivity) ctx).getGameClient().getGame().getProject().getItemList(Object.class);
+
+                header.addView(new Label(ctx, Localization.localize("game.choose_object")));
+                body.addView(new ObjectChooser(ctx, objects));
+                footer.addView(new ConcedeButton(ctx));
+                break;
+
+            case GAME_SCREEN:
+                header.addView(inflate(ctx, R.layout.selected_object));
+                footer.addView(new ConcedeButton(ctx));
+                break;
         }
+    }
+
+    /** Inflates in-game layouts. */
+    private static View inflate(Activity ctx, int layoutId) {
+        Project project = ((MainActivity) ctx).getGameClient().getGame().getProject();
+        Object object = ((MainActivity) ctx).getGameClient().getGame().getObject();
+
+        View view = View.inflate(ctx, layoutId, null);
+
+        // couldn't use switch because resource ids are not final
+        if(layoutId == R.layout.selected_object) {
+            ImageView image = view.findViewById(R.id.selected_object_image);
+            TextView name = view.findViewById(R.id.selected_object_name);
+            ImageView info = view.findViewById(R.id.info_button);
+
+            image.setImageBitmap(IOManager.getImage(object.getImage()));
+            name.setText(object.getName());
+            info.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, object));
+        }
+
+        return view;
     }
 
 }

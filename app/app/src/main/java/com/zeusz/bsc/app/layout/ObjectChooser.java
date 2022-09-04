@@ -3,12 +3,14 @@ package com.zeusz.bsc.app.layout;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ListView;
 
+import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.adapter.ObjectListAdapter;
+import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.core.Project;
+
+import java.util.List;
 
 
 public class ObjectChooser extends ListView {
@@ -17,21 +19,15 @@ public class ObjectChooser extends ListView {
         super(context, attrs);
     }
 
-    public ObjectChooser(Activity ctx, Project project) {
+    public ObjectChooser(Activity ctx, List<Object> objects) {
         this(ctx, (AttributeSet) null);
-        setAdapter(new ObjectListAdapter(ctx, project.getItemList(Object.class)));
+        setAdapter(new ObjectListAdapter(ctx, objects));
         setClickable(true);
-        setOnItemClickListener(null);   // TODO
-    }
-
-    /** Used at the beginning of the game. Selects the player's object. */
-    public void selectClick(View view, int position) {
-
-    }
-
-    /** Used while in game. Clicking on an object item will display it's attributes. */
-    public void detailClick(View view, int position) {
-
+        setOnItemClickListener((parent, view, position, id) -> {
+            Object object = (Object) getItemAtPosition(position);
+            ((MainActivity) ctx).getGameClient().getGame().selectObject(object);
+            ViewManager.show(ctx, ViewManager.GAME_SCREEN);
+        });
     }
 
 }
