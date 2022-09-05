@@ -10,17 +10,11 @@ import androidx.annotation.Nullable;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
-import com.zeusz.bsc.app.adapter.AttributeListAdapter;
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
 import com.zeusz.bsc.app.layout.AttributeList;
-import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
-import com.zeusz.bsc.core.Pair;
 import com.zeusz.bsc.core.Project;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public final class DialogBuilder extends AlertDialog.Builder {
@@ -82,15 +76,15 @@ public final class DialogBuilder extends AlertDialog.Builder {
     public static void showAttributeList(Activity ctx, @Nullable Object object) {
         ctx.runOnUiThread(() -> {
             AttributeList attributes = new AttributeList(ctx, object);
+            AlertDialog.Builder builder = new DialogBuilder(ctx);
 
-            AlertDialog.Builder builder = new DialogBuilder(ctx)
-                    .setTitle(Localization.localize("game.object_attributes"))
-                    .setView(attributes);
+            builder.setView(attributes);
 
             if(object != null) {
-                // show button only if viewing selected object's attributes
+                // show button (and title) only if viewing selected object's attributes
                 // not when choosing an attribute to build a question with
                 builder.setPositiveButton(R.string.ok, DialogBuilder.DISMISS);
+                builder.setTitle(Localization.localize("game.object_attributes"));
             }
 
             AlertDialog dialog = builder.create();

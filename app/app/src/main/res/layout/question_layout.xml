@@ -20,12 +20,14 @@
                 android:id="@+id/selected_attribute_caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/selected_attribute_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:textSize="24sp" />
 
         </LinearLayout>
@@ -48,7 +50,9 @@
         <TextView
             android:id="@+id/question_part_1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
         <Spinner
             android:id="@+id/attribute_spinner"
@@ -58,7 +62,9 @@
         <TextView
             android:id="@+id/question_part_2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
     </com.google.android.flexbox.FlexboxLayout>
 

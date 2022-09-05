@@ -8,14 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
-import com.zeusz.bsc.app.adapter.ValueListAdapter;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
@@ -182,18 +180,11 @@ public final class ViewManager {
 
             caption.setText(Localization.localize("game.selected_attribute_caption"));
             name.setText(attribute.getName());
+            selectBtn.setText(Localization.localize("game.attributes"));
             selectBtn.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, null));
 
             // attribute render
-            String[] text = attribute.getQuestion().split("\\{\\$attr\\}");
-
-            TextView question1 = view.findViewById(R.id.question_part_1);
-            TextView question2 = view.findViewById(R.id.question_part_2);
-            Spinner spinner = view.findViewById(R.id.attribute_spinner);
-
-            question1.setText(text[0]);
-            question2.setText(text[1]);
-            spinner.setAdapter(new ValueListAdapter(ctx, R.layout.value_item, attribute.getValues()));
+            Question.render(ctx, view, attribute);
         }
 
         return view;
