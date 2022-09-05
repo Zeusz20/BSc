@@ -83,6 +83,8 @@ public class GameClient extends Channel {
     public void setMeta(boolean isHost, String id) {
         this.isHost = isHost;
         this.id = id.toUpperCase();
+
+        game.setTurn(isHost);
     }
 
     public void setState(State state) { this.state = state; }
@@ -100,19 +102,19 @@ public class GameClient extends Channel {
 
         try {
             // player has chosen an object, inform opponent about it
-            Thread objectSelection = new Thread(new Task(ctx, () -> handshake(SERVER_INFO.getString("ready"), id)));
-            objectSelection.start();
-            objectSelection.join();
+            handshake(SERVER_INFO.getString("ready"), id);
         }
-        catch(Exception e) { ctx.setGameClient(null); }
+        catch(Exception e) {
+            ctx.setGameClient(null);
+        }
 
         // wait for other player to choose an object
-        game.show(ctx, opponentReady ? ViewManager.GAME_SCREEN : ViewManager.LOADING_SCREEN);
+        ViewManager.show(ctx, opponentReady ? ViewManager.GAME_SCREEN : ViewManager.LOADING_SCREEN);
     }
 
     @Override
     public void parse(String response) throws Exception {
-        synchronized(Channel.LOCK) {
+        synchronized(Channel.INPUT_LOCK) {
             if(response == null) return;
 
             if(SERVER_INFO.getString("disconnect").equals(response)) {
@@ -149,6 +151,10 @@ public class GameClient extends Channel {
         return dictionary;
     }
 
+    public void sendQuestion() {
+
+    }
+
     /**
      * Initializes the game and the client when it is in the state of CREATE or JOIN.
      * After initialization the host is put to the WAITING state, while the
@@ -165,7 +171,7 @@ public class GameClient extends Channel {
 
         // render waiting screen
         if(isHost)
-            game.show(ctx, ViewManager.LOADING_SCREEN);
+            ViewManager.show(ctx, ViewManager.LOADING_SCREEN);
     }
 
     /**
@@ -201,12 +207,11 @@ public class GameClient extends Channel {
         // host already has the project loaded
         if(!isHost) {
             game.loadProject(ctx, filename);
-            send(SERVER_INFO.getString("ready"));
-            send(id);   // needed for identification
+            handshake(SERVER_INFO.getString("ready"), id);
         }
 
         setState(State.IN_GAME);
-        game.show(ctx, ViewManager.OBJECT_SELECTION);
+        ViewManager.show(ctx, ViewManager.OBJECT_SELECTION);
     }
 
     /**
@@ -219,9 +224,9 @@ public class GameClient extends Channel {
             // (at the beginning of the game)
             opponentReady = true;
 
-            // player has already chosen an object (not opponent)
+            // player has already chosen an object
             if(game.getObject() != null)
-                game.show(ctx, ViewManager.GAME_SCREEN);
+                ViewManager.show(ctx, ViewManager.GAME_SCREEN);
         }
         else {
             // update game state

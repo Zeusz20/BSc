@@ -23,7 +23,8 @@ import java.nio.charset.StandardCharsets;
 public abstract class Channel implements Closeable {
 
     /* Static functionalities */
-    protected static final java.lang.Object LOCK = new java.lang.Object();
+    protected static final java.lang.Object INPUT_LOCK = new java.lang.Object();
+    protected static final java.lang.Object OUTPUT_LOCK = new java.lang.Object();
 
     protected static Dictionary SERVER_INFO;
 
@@ -87,17 +88,11 @@ public abstract class Channel implements Closeable {
     public void disconnect() {
         isConnected = false;
 
-        Thread closeConnection = new Thread(() -> {
-            try { send(SERVER_INFO.getString("disconnect")); }
-            catch(Exception e) { /* couldn't connect to server */ }
-        });
-
         try {
             // disconnect from server
-            closeConnection.start();
-            closeConnection.join();
+            send(SERVER_INFO.getString("disconnect"));
         }
-        catch(InterruptedException e) {
+        catch(Exception e) {
             // couldn't disconnect cleanly from the server
         }
         finally {
@@ -114,12 +109,19 @@ public abstract class Channel implements Closeable {
     }
 
     public void send(String message) throws Exception {
-        writer.write(message);
-        writer.newLine();
-        writer.flush();
+        Thread thread = new Thread(new Task(ctx, () -> {
+            synchronized(Channel.OUTPUT_LOCK) {
+                // wait for server to process previous sent message before client can send another one
+                Thread.sleep(10);
 
-        // wait for server to process sent message before client can send another one
-        Thread.sleep(10);
+                writer.write(message);
+                writer.newLine();
+                writer.flush();
+            }
+        }));
+
+        thread.start();
+        thread.join();
     }
 
     public void handshake(String action, String initialMsg) throws Exception {

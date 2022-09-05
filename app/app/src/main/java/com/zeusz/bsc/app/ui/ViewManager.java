@@ -5,14 +5,17 @@ import android.graphics.Color;
 import android.text.Editable;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.adapter.ValueListAdapter;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
@@ -25,8 +28,10 @@ import com.zeusz.bsc.app.widget.ConcedeButton;
 import com.zeusz.bsc.app.widget.Label;
 import com.zeusz.bsc.app.widget.LoadingIcon;
 import com.zeusz.bsc.app.widget.MenuButton;
+import com.zeusz.bsc.app.widget.SendButton;
 import com.zeusz.bsc.app.widget.TextInput;
 import com.zeusz.bsc.app.widget.Title;
+import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
@@ -116,8 +121,9 @@ public final class ViewManager {
 
             case LOADING_SCREEN:
                 header.addViews(
-                        new Label(ctx, Localization.localize("game.your_id")),
-                        new Label(ctx, ((MainActivity) ctx).getGameClient().getId(), 48.0f)
+                        new Label(ctx, Localization.localize("game.game_id")),
+                        new Label(ctx, ((MainActivity) ctx).getGameClient().getId(), 48.0f),
+                        new Label(ctx, ((MainActivity) ctx).getGameClient().getGame().getProject().getName())
                 );
                 body.addViews(
                         new Label(ctx, Localization.localize("game.waiting_for_player")),
@@ -135,7 +141,15 @@ public final class ViewManager {
                 break;
 
             case GAME_SCREEN:
-                header.addView(inflate(ctx, R.layout.selected_object));
+                header.addViews(
+                        inflate(ctx, R.layout.selected_object)
+                        // TODO objects button
+                );
+                body.addViews(
+                        inflate(ctx, R.layout.question_layout),
+                        new SendButton(ctx)
+                        // TODO question history
+                );
                 footer.addView(new ConcedeButton(ctx));
                 break;
         }
@@ -157,6 +171,29 @@ public final class ViewManager {
             image.setImageBitmap(IOManager.getImage(object.getImage()));
             name.setText(object.getName());
             info.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, object));
+        }
+        else if(layoutId == R.layout.question_layout) {
+            Attribute attribute = project.getItemList(Attribute.class).get(0); // default to 1st attribute in project
+
+            // attribute selection
+            TextView caption = view.findViewById(R.id.selected_attribute_caption);
+            TextView name = view.findViewById(R.id.selected_attribute_name);
+            Button selectBtn = view.findViewById(R.id.select_attribute_button);
+
+            caption.setText(Localization.localize("game.selected_attribute_caption"));
+            name.setText(attribute.getName());
+            selectBtn.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, null));
+
+            // attribute render
+            String[] text = attribute.getQuestion().split("\\{\\$attr\\}");
+
+            TextView question1 = view.findViewById(R.id.question_part_1);
+            TextView question2 = view.findViewById(R.id.question_part_2);
+            Spinner spinner = view.findViewById(R.id.attribute_spinner);
+
+            question1.setText(text[0]);
+            question2.setText(text[1]);
+            spinner.setAdapter(new ValueListAdapter(ctx, R.layout.value_item, attribute.getValues()));
         }
 
         return view;
