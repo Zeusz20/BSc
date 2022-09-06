@@ -17,7 +17,7 @@ public class MenuButton extends AppCompatButton {
     public MenuButton(Activity ctx, String text, Runnable onClick) {
         this(ctx, (AttributeSet) null);
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        setOnClickListener(listener -> onClick.run());
+        setOnClickListener(root -> onClick.run());
         setText(text);
     }
 

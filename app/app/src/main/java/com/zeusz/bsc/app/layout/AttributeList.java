@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.adapter.AttributeListAdapter;
-import com.zeusz.bsc.app.ui.Question;
+import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Pair;
@@ -42,7 +42,7 @@ public class AttributeList extends ListView {
             // so player can select one for question prep
             if(dialog != null && object == null) {
                 Attribute attribute = (Attribute) getItemAtPosition(position);
-                Question.render(ctx, null, attribute);
+                ViewManager.buildQuestion(ctx, null, attribute, true);
                 dialog.dismiss();
             }
         });

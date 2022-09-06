@@ -45,7 +45,7 @@ public class ProjectListAdapter extends Adapter<File> {
             ImageView deleteBtn = view.findViewById(R.id.delete_button);
 
             dateView.setText(new java.sql.Date(file.lastModified()).toString());
-            deleteBtn.setOnClickListener(listener -> DialogBuilder.delete(this, project));
+            deleteBtn.setOnClickListener(v -> DialogBuilder.delete(this, project));
         }
 
         return view;

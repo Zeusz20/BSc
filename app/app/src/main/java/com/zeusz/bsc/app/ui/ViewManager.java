@@ -8,12 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.adapter.ValueListAdapter;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
@@ -143,6 +146,7 @@ public final class ViewManager {
                         inflate(ctx, R.layout.selected_object)
                         // TODO objects button
                 );
+                body.setGravity(Gravity.NO_GRAVITY);
                 body.addViews(
                         inflate(ctx, R.layout.question_layout),
                         new SendButton(ctx)
@@ -158,36 +162,60 @@ public final class ViewManager {
         Project project = ((MainActivity) ctx).getGameClient().getGame().getProject();
         Object object = ((MainActivity) ctx).getGameClient().getGame().getObject();
 
-        View view = View.inflate(ctx, layoutId, null);
+        View root = View.inflate(ctx, layoutId, null);
 
         // couldn't use switch because resource ids are not final
         if(layoutId == R.layout.selected_object) {
-            ImageView image = view.findViewById(R.id.selected_object_image);
-            TextView name = view.findViewById(R.id.selected_object_name);
-            ImageView info = view.findViewById(R.id.info_button);
+            ImageView image = root.findViewById(R.id.selected_object_image);
+            TextView name = root.findViewById(R.id.selected_object_name);
+            ImageView info = root.findViewById(R.id.info_button);
 
             image.setImageBitmap(IOManager.getImage(object.getImage()));
             name.setText(object.getName());
-            info.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, object));
+            info.setOnClickListener(view -> DialogBuilder.showAttributeList(ctx, object));
         }
         else if(layoutId == R.layout.question_layout) {
             Attribute attribute = project.getItemList(Attribute.class).get(0); // default to 1st attribute in project
 
             // attribute selection
-            TextView caption = view.findViewById(R.id.selected_attribute_caption);
-            TextView name = view.findViewById(R.id.selected_attribute_name);
-            Button selectBtn = view.findViewById(R.id.select_attribute_button);
+            TextView caption = root.findViewById(R.id.selected_attribute_caption);
+            TextView name = root.findViewById(R.id.selected_attribute_name);
+            Button selectBtn = root.findViewById(R.id.select_attribute_button);
 
             caption.setText(Localization.localize("game.selected_attribute_caption"));
             name.setText(attribute.getName());
             selectBtn.setText(Localization.localize("game.attributes"));
-            selectBtn.setOnClickListener(listener -> DialogBuilder.showAttributeList(ctx, null));
+            selectBtn.setOnClickListener(view -> DialogBuilder.showAttributeList(ctx, null));
 
             // attribute render
-            Question.render(ctx, view, attribute);
+            buildQuestion(ctx, root, attribute, true);
         }
 
-        return view;
+        return root;
+    }
+
+    public static String buildQuestion(Activity ctx, @Nullable View view, Attribute attribute, boolean render) {
+        if(view == null)
+            view = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
+
+        String[] text = attribute.getQuestion().split("\\{\\$attr\\}");
+
+        TextView name = view.findViewById(R.id.selected_attribute_name);
+        TextView question1 = view.findViewById(R.id.question_part_1);
+        TextView question2 = view.findViewById(R.id.question_part_2);
+        Spinner spinner = view.findViewById(R.id.attribute_spinner);
+
+        if(render) {
+            name.setText(attribute.getName());
+            spinner.setAdapter(new ValueListAdapter(ctx, R.layout.value_item, attribute.getValues()));
+            question1.setText(text[0]);
+
+            // the substitute pattern may be at the end
+            if(text.length > 1)
+                question2.setText(text[1]);
+        }
+
+        return question1.getText().toString() + spinner.getSelectedItem().toString() + question2.getText().toString();
     }
 
 }

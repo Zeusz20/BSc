@@ -8,6 +8,7 @@ import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
+import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
@@ -142,19 +143,6 @@ public class GameClient extends Channel {
         }
     }
 
-    /** @return The base structure of a request. */
-    protected Dictionary getMessage() throws Exception {
-        Dictionary dictionary = new Dictionary(null);
-        dictionary.put("is_host", isHost);
-        dictionary.put("game_id", id);
-
-        return dictionary;
-    }
-
-    public void sendQuestion() {
-
-    }
-
     /**
      * Initializes the game and the client when it is in the state of CREATE or JOIN.
      * After initialization the host is put to the WAITING state, while the
@@ -232,6 +220,36 @@ public class GameClient extends Channel {
             // update game state
             game.update(ctx, new Dictionary(response));
         }
+    }
+
+    /** @return The base structure of a request. */
+    protected Dictionary getMessage() throws Exception {
+        return new Dictionary(null).put("is_host", isHost).put("game_id", id);
+    }
+
+    public void sendQuestion(Attribute attribute, String value, String question) {
+        try {
+            send(getMessage()
+                    .put("attribute", attribute.getName())
+                    .put("value", value)
+                    .put("question", question)
+                    .toString()
+            );
+        }
+        catch(Exception e) { /* Couldn't send question */ }
+    }
+
+    public void sendAnswer(Attribute attribute, String value, String question, boolean answer) {
+        try {
+            send(getMessage()
+                    .put("attribute", attribute.getName())
+                    .put("value", value)
+                    .put("question", question)
+                    .put("answer", answer)
+                    .toString()
+            );
+        }
+        catch(Exception e) { /* Couldn't send answer */ }
     }
 
 }

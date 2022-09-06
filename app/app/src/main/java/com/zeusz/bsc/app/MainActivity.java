@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        View button = findViewById(R.id.back_btn);
+        View button = findViewById(R.id.back_button);
         if(button != null) button.callOnClick();
     }
 

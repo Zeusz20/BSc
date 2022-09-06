@@ -12,9 +12,12 @@ import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
 import com.zeusz.bsc.app.layout.AttributeList;
+import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
+
+import java.util.Optional;
 
 
 public final class DialogBuilder extends AlertDialog.Builder {
@@ -93,9 +96,37 @@ public final class DialogBuilder extends AlertDialog.Builder {
         });
     }
 
-    public static void show(Activity ctx) {
-        // TODO
-        //  in game dialogs between clients
+    public static void showQuestion(Activity ctx, String attributeName, String value, String question) {
+        ctx.runOnUiThread(() -> {
+            Project project = ((MainActivity) ctx).getGameClient().getGame().getProject();
+            Object object = ((MainActivity) ctx).getGameClient().getGame().getObject();
+
+            Attribute attribute = project.getItemList(Attribute.class).stream()
+                    .filter(it -> it.getName().equals(attributeName))
+                    .findAny().get();
+
+            boolean hasAttribute = object.getAttributes().stream()
+                    .anyMatch(it -> it.getKey().equals(attribute) && it.getValue().equals(value));
+
+            new DialogBuilder(ctx)
+                    .setCancelable(false)
+                    .setMessage(question)
+                    .setPositiveButton(Localization.localize(hasAttribute ? "word.yes" : "word.no"), (dialog, which) -> {
+                        ((MainActivity) ctx).getGameClient().sendAnswer(attribute, value, question, hasAttribute);
+                    })
+                    .create().show();
+        });
+    }
+
+    public static void showAnswer(Activity ctx, String question, boolean answer) {
+        ctx.runOnUiThread(() -> {
+            new DialogBuilder(ctx)
+                    .setIcon(answer ? R.drawable.positive_feedback : R.drawable.negative_feedback)
+                    .setTitle(Localization.localize(answer ? "word.yes" : "word.no"))
+                    .setMessage(question)
+                    .setPositiveButton(R.string.ok, DialogBuilder.DISMISS)
+                    .create().show();
+        });
     }
 
     /* Class fields and methods */

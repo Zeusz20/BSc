@@ -6,18 +6,14 @@ import androidx.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 
-
+/** Wrapper class for {@link JSONObject}. */
 public class Dictionary {
 
-    private JSONObject json;
-    private Map<String, Object> values;
+    private final JSONObject json;
 
     public Dictionary(@Nullable String json) throws JSONException {
         this.json = (json == null) ? new JSONObject() : new JSONObject(json);
-        this.values = new HashMap<>();
     }
 
     /* Allows chaining */
@@ -45,20 +41,10 @@ public class Dictionary {
         return (Boolean) get(name);
     }
 
-    /**
-     * Only call this right before sending the dictionary object to
-     * the server because this will clear the "values" map.
-     * */
     @NonNull
     @Override
     public String toString() {
-        values.keySet().forEach(it -> put(it, values.get(it)));
-        values.clear();
-
-        String result = json.toString();
-        json = new JSONObject();
-
-        return result;
+        return json.toString();
     }
 
 }

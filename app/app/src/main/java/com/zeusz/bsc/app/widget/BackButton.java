@@ -26,7 +26,7 @@ public class BackButton extends MenuButton {
             ViewManager.show(ctx, previousMenuId);
         });
 
-        setId(R.id.back_btn);
+        setId(R.id.back_button);
     }
 
 }
