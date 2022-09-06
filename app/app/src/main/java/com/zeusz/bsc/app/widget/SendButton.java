@@ -15,14 +15,23 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.layout.MenuLayout;
+import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 
 public class SendButton extends MenuLayout {
+
+    public static void globalStateToggle(Activity ctx) {
+        View content = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
+        ((SendButton) content.findViewById(R.id.send_button)).toggleState(ctx);
+    }
+
+    protected boolean turn; // is the player's turn?
 
     public SendButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -30,6 +39,17 @@ public class SendButton extends MenuLayout {
 
     public SendButton(Activity ctx) {
         super(ctx, LinearLayout.VERTICAL);
+
+        try {
+            // was too lazy to refactor game client's code for a single getter
+            Field field = GameClient.class.getDeclaredField("isHost");
+            field.setAccessible(true);
+            turn = (boolean) field.get(((MainActivity) ctx).getGameClient());
+        }
+        catch(Exception e) {
+            turn = true;
+        }
+
         setId(R.id.send_button);
         toggleState(ctx);
     }
@@ -37,9 +57,13 @@ public class SendButton extends MenuLayout {
     /** Enables/disables the button depending on if it's the player's turn. */
     public void toggleState(Activity ctx) {
         ctx.runOnUiThread(this::removeAllViews);
+        turn = !turn;
 
-        if(((MainActivity) ctx).getGameClient().getGame().getTurn()) {
-            MenuButton button = new MenuButton(ctx, Localization.localize("game.ask_question"), () -> askQuestion(ctx));
+        if(turn) {
+            MenuButton button = new MenuButton(ctx, Localization.localize("game.ask_question"), () -> {
+                askQuestion(ctx);
+                toggleState(ctx);   // disable button after sending question
+            });
             ctx.runOnUiThread(() -> addView(button));
         }
         else {
@@ -83,7 +107,6 @@ public class SendButton extends MenuLayout {
         String question = ViewManager.buildQuestion(ctx, null, attribute, false);
 
         ((MainActivity) ctx).getGameClient().sendQuestion(attribute, value, question);
-        toggleState(ctx);   // disable button after sending question
     }
 
 }

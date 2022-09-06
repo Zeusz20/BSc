@@ -3,9 +3,10 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.DialogBuilder;
+import com.zeusz.bsc.app.dialog.GameDialog;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.core.Cloud;
+import com.zeusz.bsc.core.Localization;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 public abstract class Channel implements Closeable {
 
     /* Static functionalities */
+    protected static final int WAIT = 20;
+
     protected static final java.lang.Object INPUT_LOCK = new java.lang.Object();
     protected static final java.lang.Object OUTPUT_LOCK = new java.lang.Object();
 
@@ -32,7 +35,7 @@ public abstract class Channel implements Closeable {
         if(SERVER_INFO == null) Channel.fetch();
 
         if(SERVER_INFO == null) {
-            DialogBuilder.error(ctx, "net.server_unavailable");
+            new GameDialog(ctx, Localization.localize("net.server_unavailable")).show();
             return false;
         }
 
@@ -112,7 +115,7 @@ public abstract class Channel implements Closeable {
         Thread thread = new Thread(new Task(ctx, () -> {
             synchronized(Channel.OUTPUT_LOCK) {
                 // wait for server to process previous sent message before client can send another one
-                Thread.sleep(10);
+                Thread.sleep(WAIT);
 
                 writer.write(message);
                 writer.newLine();

@@ -1,6 +1,7 @@
 package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.view.Gravity;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -17,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.adapter.ValueListAdapter;
+import com.zeusz.bsc.app.dialog.AttributeListDialog;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
@@ -52,6 +55,12 @@ public final class ViewManager {
     public static final int LOADING_SCREEN = 5;
     public static final int OBJECT_SELECTION = 6;
     public static final int GAME_SCREEN = 7;
+
+    public static void toast(Context context, String message) {
+        ((Activity) context).runOnUiThread(() -> {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        });
+    }
 
     public static void show(Activity ctx, int layoutId) {
         View menu = View.inflate(ctx, R.layout.base_layout, null);
@@ -172,7 +181,7 @@ public final class ViewManager {
 
             image.setImageBitmap(IOManager.getImage(object.getImage()));
             name.setText(object.getName());
-            info.setOnClickListener(view -> DialogBuilder.showAttributeList(ctx, object));
+            info.setOnClickListener(view -> new AttributeListDialog(ctx, object).show());
         }
         else if(layoutId == R.layout.question_layout) {
             Attribute attribute = project.getItemList(Attribute.class).get(0); // default to 1st attribute in project
@@ -185,7 +194,7 @@ public final class ViewManager {
             caption.setText(Localization.localize("game.selected_attribute_caption"));
             name.setText(attribute.getName());
             selectBtn.setText(Localization.localize("game.attributes"));
-            selectBtn.setOnClickListener(view -> DialogBuilder.showAttributeList(ctx, null));
+            selectBtn.setOnClickListener(view -> new AttributeListDialog(ctx, null).show());
 
             // attribute render
             buildQuestion(ctx, root, attribute, true);

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.DialogBuilder;
+import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Localization;
 
 
@@ -32,7 +32,7 @@ public class DownloadReceiver extends BroadcastReceiver {
          * If game client isn't running (null) show toast message,
          * because download was initiated from the JS browser. */
         if(ctx.getGameClient() == null)
-            DialogBuilder.toast(ctx, Localization.localize("browser.download_complete"));
+            ViewManager.toast(ctx, Localization.localize("browser.download_complete"));
     }
 
     @Override

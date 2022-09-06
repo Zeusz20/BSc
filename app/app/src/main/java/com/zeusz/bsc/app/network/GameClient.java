@@ -3,7 +3,6 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
-import com.zeusz.bsc.app.ui.DialogBuilder;
 import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
@@ -14,13 +13,13 @@ import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
 
+import org.json.JSONException;
+
 import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
 
 public class GameClient extends Channel {
-
-    /* Static functionalities */
 
     /**
      * @param state
@@ -84,8 +83,6 @@ public class GameClient extends Channel {
     public void setMeta(boolean isHost, String id) {
         this.isHost = isHost;
         this.id = id.toUpperCase();
-
-        game.setTurn(isHost);
     }
 
     public void setState(State state) { this.state = state; }
@@ -150,7 +147,7 @@ public class GameClient extends Channel {
      * */
     protected void init(boolean isHost, String id) {
         if(id.equals(SERVER_INFO.getString("invalid"))) {
-            DialogBuilder.toast(ctx, Localization.localize("game.invalid"));
+            ViewManager.toast(ctx, Localization.localize("game.invalid"));
             return;
         }
 
@@ -223,8 +220,14 @@ public class GameClient extends Channel {
     }
 
     /** @return The base structure of a request. */
-    protected Dictionary getMessage() throws Exception {
-        return new Dictionary(null).put("is_host", isHost).put("game_id", id);
+    protected Dictionary getMessage() {
+        try {
+            return new Dictionary(null).put("is_host", isHost).put("game_id", id);
+        }
+        catch(JSONException e) {
+            ctx.setGameClient(null);
+            return null;
+        }
     }
 
     public void sendQuestion(Attribute attribute, String value, String question) {
@@ -236,7 +239,7 @@ public class GameClient extends Channel {
                     .toString()
             );
         }
-        catch(Exception e) { /* Couldn't send question */ }
+        catch(Exception e) {}
     }
 
     public void sendAnswer(Attribute attribute, String value, String question, boolean answer) {
@@ -249,7 +252,7 @@ public class GameClient extends Channel {
                     .toString()
             );
         }
-        catch(Exception e) { /* Couldn't send answer */ }
+        catch(Exception e) {}
     }
 
 }

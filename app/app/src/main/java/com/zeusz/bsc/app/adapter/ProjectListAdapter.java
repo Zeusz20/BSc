@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zeusz.bsc.app.R;
-import com.zeusz.bsc.app.ui.DialogBuilder;
+import com.zeusz.bsc.app.dialog.DeleteDialog;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Project;
@@ -45,7 +45,7 @@ public class ProjectListAdapter extends Adapter<File> {
             ImageView deleteBtn = view.findViewById(R.id.delete_button);
 
             dateView.setText(new java.sql.Date(file.lastModified()).toString());
-            deleteBtn.setOnClickListener(v -> DialogBuilder.delete(this, project));
+            deleteBtn.setOnClickListener(v -> new DeleteDialog((Activity) getContext(), project, this).show());
         }
 
         return view;
