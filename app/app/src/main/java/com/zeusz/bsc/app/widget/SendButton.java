@@ -14,56 +14,64 @@ import androidx.appcompat.view.ContextThemeWrapper;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.dialog.ObjectListDialog;
 import com.zeusz.bsc.app.layout.MenuLayout;
-import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
+import com.zeusz.bsc.core.Object;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 
 public class SendButton extends MenuLayout {
 
-    public static void globalStateToggle(Activity ctx) {
-        View content = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
-        ((SendButton) content.findViewById(R.id.send_button)).toggleState(ctx);
+    /* Static functionalities */
+    protected static boolean turn; // is the player's turn?
+
+    public static void init(boolean turn) {
+        SendButton.turn = turn;
     }
 
-    protected boolean turn; // is the player's turn?
+    public static void toggleAll(Activity ctx) {
+        turn = !turn;
+
+        View content = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
+        String tag = ctx.getResources().getString(R.string.send_button);
+
+        System.out.println(ViewManager.findViewsByTag(content, tag));
+        for(View view: ViewManager.findViewsByTag(content, tag))
+            ((SendButton) view).toggle(ctx);
+    }
+
+    /* Class fields and methods */
+    protected String text;
+    protected boolean isGuess;
 
     public SendButton(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SendButton(Activity ctx) {
+    public SendButton(Activity ctx, String text, boolean isGuess) {
         super(ctx, LinearLayout.VERTICAL);
 
-        try {
-            // was too lazy to refactor game client's code for a single getter
-            Field field = GameClient.class.getDeclaredField("isHost");
-            field.setAccessible(true);
-            turn = (boolean) field.get(((MainActivity) ctx).getGameClient());
-        }
-        catch(Exception e) {
-            turn = true;
-        }
+        this.text = text;
+        this.isGuess = isGuess;
 
-        setId(R.id.send_button);
-        toggleState(ctx);
+        setTag(ctx.getResources().getString(R.string.send_button));
+        toggle(ctx);
     }
 
     /** Enables/disables the button depending on if it's the player's turn. */
-    public void toggleState(Activity ctx) {
+    protected void toggle(Activity ctx) {
         ctx.runOnUiThread(this::removeAllViews);
-        turn = !turn;
 
         if(turn) {
-            MenuButton button = new MenuButton(ctx, Localization.localize("game.ask_question"), () -> {
-                askQuestion(ctx);
-                toggleState(ctx);   // disable button after sending question
+            MenuButton button = new MenuButton(ctx, text, () -> {
+                if(isGuess) guessObject(ctx);
+                else askQuestion(ctx);
             });
+
             ctx.runOnUiThread(() -> addView(button));
         }
         else {
@@ -90,6 +98,11 @@ public class SendButton extends MenuLayout {
         }
     }
 
+    protected void guessObject(Activity ctx) {
+        List<Object> objects = ((MainActivity) ctx).getGameClient().getGame().getProject().getItemList(Object.class);
+        new ObjectListDialog(ctx, objects).show();
+    }
+
     protected void askQuestion(Activity ctx) {
         List<Attribute> attributes = ((MainActivity) ctx).getGameClient().getGame().getProject().getItemList(Attribute.class);
         View content = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
@@ -106,6 +119,7 @@ public class SendButton extends MenuLayout {
         String value = spinner.getSelectedItem().toString();
         String question = ViewManager.buildQuestion(ctx, null, attribute, false);
 
+        SendButton.toggleAll(ctx);
         ((MainActivity) ctx).getGameClient().sendQuestion(attribute, value, question);
     }
 

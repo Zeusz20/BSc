@@ -7,6 +7,7 @@ import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
+import com.zeusz.bsc.app.widget.SendButton;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
@@ -153,6 +154,7 @@ public class GameClient extends Channel {
 
         setMeta(isHost, id);
         setState(isHost ? State.WAITING : State.FILE_DOWNLOAD);
+        SendButton.init(isHost); // who will start the first turn
 
         // render waiting screen
         if(isHost)
@@ -249,6 +251,27 @@ public class GameClient extends Channel {
                     .put("value", value)
                     .put("question", question)
                     .put("answer", answer)
+                    .toString()
+            );
+        }
+        catch(Exception e) {}
+    }
+
+    public void sendAnswer(Object object, boolean answer) {
+        try {
+            send(getMessage()
+                    .put("object", object.getName())
+                    .put("answer", answer)
+                    .toString()
+            );
+        }
+        catch(Exception e) {}
+    }
+
+    public void sendGuess(Object object) {
+        try {
+            send(getMessage()
+                    .put("object", object.getName())
                     .toString()
             );
         }

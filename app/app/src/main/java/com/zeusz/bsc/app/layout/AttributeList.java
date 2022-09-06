@@ -1,10 +1,8 @@
 package com.zeusz.bsc.app.layout;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 
@@ -19,9 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class AttributeList extends ListView {
-
-    protected AlertDialog dialog;
+public class AttributeList extends AttachedListView {
 
     public AttributeList(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,10 +42,6 @@ public class AttributeList extends ListView {
                 dialog.dismiss();
             }
         });
-    }
-
-    public void setDialog(AlertDialog dialog) {
-        this.dialog = dialog;
     }
 
 }

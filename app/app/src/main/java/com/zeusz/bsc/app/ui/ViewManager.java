@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.text.Editable;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
@@ -23,8 +24,8 @@ import com.zeusz.bsc.app.dialog.AttributeListDialog;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
-import com.zeusz.bsc.app.layout.ObjectChooser;
-import com.zeusz.bsc.app.layout.ProjectChooser;
+import com.zeusz.bsc.app.layout.ObjectList;
+import com.zeusz.bsc.app.layout.ProjectList;
 import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.app.widget.BackButton;
@@ -40,7 +41,9 @@ import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public final class ViewManager {
@@ -60,6 +63,26 @@ public final class ViewManager {
         ((Activity) context).runOnUiThread(() -> {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         });
+    }
+
+    public static List<View> findViewsByTag(View root, String tag) {
+        List<View> views = new ArrayList<>();
+
+        if(root instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) root;
+
+            for(int i = 0; i < group.getChildCount(); i++) {
+                View child = group.getChildAt(i);
+
+                if(Objects.equals(child.getTag(), tag))
+                    views.add(child);
+
+                if(child instanceof ViewGroup)
+                    views.addAll(findViewsByTag((ViewGroup) child, tag));
+            }
+        }
+
+        return views;
     }
 
     public static void show(Activity ctx, int layoutId) {
@@ -102,7 +125,7 @@ public final class ViewManager {
                 break;
 
             case PROJECTS_MENU:
-                ProjectChooser chooser = new ProjectChooser(ctx);
+                ProjectList chooser = new ProjectList(ctx);
                 LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
                 params.setMargins(4, 0, 4, 0);
@@ -146,19 +169,19 @@ public final class ViewManager {
                 List<Object> objects = ((MainActivity) ctx).getGameClient().getGame().getProject().getItemList(Object.class);
 
                 header.addView(new Label(ctx, Localization.localize("game.choose_object")));
-                body.addView(new ObjectChooser(ctx, objects));
+                body.setGravity(Gravity.NO_GRAVITY);
+                body.addView(new ObjectList(ctx, objects));
                 footer.addView(new ConcedeButton(ctx));
                 break;
 
             case GAME_SCREEN:
                 header.addViews(
-                        inflate(ctx, R.layout.selected_object)
-                        // TODO objects button
+                        inflate(ctx, R.layout.selected_object),
+                        new SendButton(ctx, Localization.localize("game.guess"), true)
                 );
-                body.setGravity(Gravity.NO_GRAVITY);
                 body.addViews(
                         inflate(ctx, R.layout.question_layout),
-                        new SendButton(ctx)
+                        new SendButton(ctx, Localization.localize("game.ask_question"), false)
                         // TODO question history
                 );
                 footer.addView(new ConcedeButton(ctx));

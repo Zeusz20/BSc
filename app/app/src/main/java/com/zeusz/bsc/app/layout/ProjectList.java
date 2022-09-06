@@ -10,13 +10,13 @@ import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.util.IOManager;
 
 
-public class ProjectChooser extends ListView {
+public class ProjectList extends ListView {
 
-    public ProjectChooser(Context context, AttributeSet attrs) {
+    public ProjectList(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public ProjectChooser(Activity ctx) {
+    public ProjectList(Activity ctx) {
         this(ctx, (AttributeSet) null);
 
         ProjectListAdapter adapter = new ProjectListAdapter(ctx, IOManager.listProjects(ctx));
