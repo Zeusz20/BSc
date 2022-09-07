@@ -17,6 +17,7 @@ import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.dialog.ObjectListDialog;
 import com.zeusz.bsc.app.layout.MenuLayout;
 import com.zeusz.bsc.app.ui.ViewManager;
+import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
@@ -120,7 +121,12 @@ public class SendButton extends MenuLayout {
         String question = ViewManager.buildQuestion(ctx, null, attribute, false);
 
         SendButton.toggleAll(ctx);
-        ((MainActivity) ctx).getGameClient().sendQuestion(attribute, value, question);
+
+        ((MainActivity) ctx).getGameClient().sendJSON(new Dictionary()
+            .put("attribute", attribute.getName())
+            .put("value", value)
+            .put("question", question)
+        );
     }
 
 }

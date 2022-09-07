@@ -10,16 +10,34 @@ import org.json.JSONObject;
 /** Wrapper class for {@link JSONObject}. */
 public class Dictionary {
 
-    private final JSONObject json;
+    private JSONObject json;
 
-    public Dictionary(@Nullable String json) throws JSONException {
-        this.json = (json == null) ? new JSONObject() : new JSONObject(json);
+    public Dictionary() {
+        this.json = new JSONObject();
+    }
+
+    public Dictionary(String json) {
+        try {
+            this.json = new JSONObject(json);
+        }
+        catch(JSONException e) {
+            this.json = new JSONObject();
+        }
     }
 
     /* Allows chaining */
     public Dictionary put(@NonNull String name, @Nullable Object value) {
         try { json.put(name, value); }
         catch(JSONException e) { /* couldn't add key-value pair */ }
+
+        return this;
+    }
+
+    public Dictionary put(Dictionary dictionary) {
+        while(dictionary.json.keys().hasNext()) {
+            String key = dictionary.json.keys().next();
+            put(key, dictionary.get(key));
+        }
 
         return this;
     }

@@ -35,7 +35,6 @@ public final class Game {
     /* Class fields and methods */
     private Project project;
     private Object object;
-    private boolean win;
 
     public Game(Project project) {
         this.project = project;
@@ -61,7 +60,6 @@ public final class Game {
      *  3) guess
      */
     public void update(Activity ctx, Dictionary data) {
-        // parse json response
         if(data.getBoolean("answer") != null) {
             // player got an answer for their question
             boolean answer = data.getBoolean("answer");
@@ -72,13 +70,17 @@ public final class Game {
         }
         else if(data.getString("question") != null) {
             // player have been asked a question
-            new QuestionDialog(ctx, data.getString("attribute"), data.getString("value"), data.getString("question")).show();
+            Attribute attribute = Game.findItemByName((MainActivity) ctx, data.getString("attribute"), Attribute.class);
+
+            new QuestionDialog(ctx, attribute, data.getString("value"), data.getString("question")).show();
             // TODO update question history
             SendButton.toggleAll(ctx);
         }
         else if(data.getString("object") != null) {
             // opponent guessed player's object
-            new GuessDialog(ctx, data.getString("object")).show();
+            Object object = findItemByName((MainActivity) ctx, data.getString("object"), Object.class);
+
+            new GuessDialog(ctx, object).show();
             SendButton.toggleAll(ctx);
         }
 

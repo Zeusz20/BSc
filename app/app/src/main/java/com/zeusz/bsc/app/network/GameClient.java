@@ -8,13 +8,10 @@ import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.app.widget.SendButton;
-import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Cloud;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.core.Project;
-
-import org.json.JSONException;
 
 import java.net.URLEncoder;
 import java.util.regex.Pattern;
@@ -205,7 +202,7 @@ public class GameClient extends Channel {
      * While in the IN_GAME state wait for other player to choose their object.
      * If the object is already chosen, handle JSON response from the server.
      * */
-    protected void update(String response) throws Exception {
+    protected void update(String response) {
         if(SERVER_INFO.getString("ready").equals(response)) {
             // dismiss loading screen because opponent has chosen an object
             // (at the beginning of the game)
@@ -221,61 +218,12 @@ public class GameClient extends Channel {
         }
     }
 
-    /** @return The base structure of a request. */
-    protected Dictionary getMessage() {
-        try {
-            return new Dictionary(null).put("is_host", isHost).put("game_id", id);
-        }
-        catch(JSONException e) {
-            ctx.setGameClient(null);
-            return null;
-        }
-    }
+    public void sendJSON(Dictionary message) {
+        // add identification info
+        message.put("is_host", isHost).put("game_id", id);
 
-    public void sendQuestion(Attribute attribute, String value, String question) {
-        try {
-            send(getMessage()
-                    .put("attribute", attribute.getName())
-                    .put("value", value)
-                    .put("question", question)
-                    .toString()
-            );
-        }
-        catch(Exception e) {}
-    }
-
-    public void sendAnswer(Attribute attribute, String value, String question, boolean answer) {
-        try {
-            send(getMessage()
-                    .put("attribute", attribute.getName())
-                    .put("value", value)
-                    .put("question", question)
-                    .put("answer", answer)
-                    .toString()
-            );
-        }
-        catch(Exception e) {}
-    }
-
-    public void sendAnswer(Object object, boolean answer) {
-        try {
-            send(getMessage()
-                    .put("object", object.getName())
-                    .put("answer", answer)
-                    .toString()
-            );
-        }
-        catch(Exception e) {}
-    }
-
-    public void sendGuess(Object object) {
-        try {
-            send(getMessage()
-                    .put("object", object.getName())
-                    .toString()
-            );
-        }
-        catch(Exception e) {}
+        try { send(message.toString()); }
+        catch(Exception e) { ctx.setGameClient(null); }
     }
 
 }

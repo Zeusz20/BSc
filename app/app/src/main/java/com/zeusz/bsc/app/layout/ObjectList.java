@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.adapter.ObjectListAdapter;
+import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.widget.SendButton;
 import com.zeusz.bsc.core.Object;
 
@@ -36,7 +37,7 @@ public class ObjectList extends AttachedListView {
             // guess opponent's object
             dialog.dismiss();  // dismiss dialog first, so it doesn't have to wait for server to process the request
             SendButton.toggleAll(ctx);
-            ((MainActivity) ctx).getGameClient().sendGuess(object);
+            ((MainActivity) ctx).getGameClient().sendJSON(new Dictionary().put("object", object.getName()));
         }
     }
 
