@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.adapter.ValueListAdapter;
 import com.zeusz.bsc.app.dialog.AttributeListDialog;
+import com.zeusz.bsc.app.layout.HistoryLayout;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
 import com.zeusz.bsc.app.layout.MenuLayout;
@@ -58,6 +60,10 @@ public final class ViewManager {
     public static final int LOADING_SCREEN = 5;
     public static final int OBJECT_SELECTION = 6;
     public static final int GAME_SCREEN = 7;
+
+    public static int pixelsToDip(Activity ctx, int pixels) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) pixels, ctx.getResources().getDisplayMetrics());
+    }
 
     public static void toast(Context context, String message) {
         ((Activity) context).runOnUiThread(() -> {
@@ -181,8 +187,9 @@ public final class ViewManager {
                 );
                 body.addViews(
                         inflate(ctx, R.layout.question_layout),
-                        new SendButton(ctx, Localization.localize("game.ask_question"), false)
-                        // TODO question history
+                        new SendButton(ctx, Localization.localize("game.ask_question"), false),
+                        new Label(ctx, Localization.localize("game.history"), 12.0f),
+                        new HistoryLayout(ctx)
                 );
                 footer.addView(new ConcedeButton(ctx));
                 break;
@@ -248,6 +255,14 @@ public final class ViewManager {
         }
 
         return question1.getText().toString() + spinner.getSelectedItem().toString() + question2.getText().toString();
+    }
+
+    public static View displayObject(Activity ctx, Object object) {
+        View view = View.inflate(ctx, R.layout.object_preview, null);
+        ((TextView) view.findViewById(R.id.object_name)).setText(object.getName());
+        ((ImageView) view.findViewById(R.id.object_image)).setImageBitmap(IOManager.getImage(object.getImage()));
+
+        return view;
     }
 
 }

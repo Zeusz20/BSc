@@ -4,9 +4,11 @@ import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
+import com.zeusz.bsc.app.dialog.AnswerDialog;
 import com.zeusz.bsc.app.dialog.GameDialog;
 import com.zeusz.bsc.app.dialog.GuessDialog;
 import com.zeusz.bsc.app.dialog.QuestionDialog;
+import com.zeusz.bsc.app.layout.HistoryLayout;
 import com.zeusz.bsc.app.util.Dictionary;
 import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.app.widget.SendButton;
@@ -61,19 +63,27 @@ public final class Game {
      */
     public void update(Activity ctx, Dictionary data) {
         if(data.getBoolean("answer") != null) {
-            // player got an answer for their question
+            // player got an answer for their question/guess
             boolean answer = data.getBoolean("answer");
-            int icon = answer ? R.drawable.positive_feedback : R.drawable.negative_feedback;
-            String title = Localization.localize(answer ? "word.yes" : "word.no");
+            HistoryLayout history = ctx.findViewById(R.id.history_layout);
 
-            new GameDialog(ctx, icon, title, data.getString("question")).show();
+            if(data.getString("object") != null) {
+                // answer to guess
+                Object object = findItemByName((MainActivity) ctx, data.getString("object"), Object.class);
+                new AnswerDialog(ctx, object, answer).show();
+                history.add(ctx, object.getName(), answer);
+            }
+            else {
+                // answer to question
+                new AnswerDialog(ctx, data.getString("question"), answer).show();
+                history.add(ctx, data.getString("question"), answer);
+            }
         }
         else if(data.getString("question") != null) {
             // player have been asked a question
             Attribute attribute = Game.findItemByName((MainActivity) ctx, data.getString("attribute"), Attribute.class);
 
             new QuestionDialog(ctx, attribute, data.getString("value"), data.getString("question")).show();
-            // TODO update question history
             SendButton.toggleAll(ctx);
         }
         else if(data.getString("object") != null) {

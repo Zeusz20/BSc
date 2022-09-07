@@ -14,6 +14,7 @@ public class AttributeListDialog extends AdapterDialog {
     public AttributeListDialog(Activity ctx, @Nullable Object object) {
         super(ctx, new AttributeList(ctx, object));
         setTitle(Localization.localize((object == null) ? "game.select_attribute" : "game.object_attributes"));
+        setPositiveButton(Localization.localize("word.cancel"), GameDialog.DISMISS);
     }
 
 }
