@@ -40,7 +40,6 @@ public class SendButton extends MenuLayout {
         View content = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
         String tag = ctx.getResources().getString(R.string.send_button);
 
-        System.out.println(ViewManager.findViewsByTag(content, tag));
         for(View view: ViewManager.findViewsByTag(content, tag))
             ((SendButton) view).toggle(ctx);
     }

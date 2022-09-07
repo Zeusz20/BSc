@@ -113,7 +113,7 @@ public class GameClient extends Channel {
         synchronized(Channel.INPUT_LOCK) {
             if(response == null) return;
 
-            if(SERVER_INFO.getString("disconnect").equals(response)) {
+            if(isDirty() && SERVER_INFO.getString("disconnect").equals(response)) {
                 ctx.setGameClient(null);
                 game.exit(ctx, isDirty());
             }

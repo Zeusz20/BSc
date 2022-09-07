@@ -91,10 +91,10 @@ public final class Game {
             Object object = findItemByName((MainActivity) ctx, data.getString("object"), Object.class);
 
             new GuessDialog(ctx, object).show();
-            SendButton.toggleAll(ctx);
-        }
 
-        // TODO end game and display winner/loser
+            // if opponent guessed correctly, don't let player to send or guess anymore
+            if(!getObject().equals(object)) SendButton.toggleAll(ctx);
+        }
     }
 
     public Project getProject() { return project; }
