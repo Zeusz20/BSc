@@ -41,7 +41,10 @@ public class GameClient extends Channel {
     }
 
     public static void createGame(Activity ctx, Project project) {
-        if(Channel.isAvailable(ctx))
+        if(!project.valid)
+            ViewManager.toast(ctx, Localization.localize("game.invalid_project"));
+
+        else if(Channel.isAvailable(ctx))
             launch(ctx, project, State.CREATE, SERVER_INFO.getString("create"), project.getSource().getName());
     }
 

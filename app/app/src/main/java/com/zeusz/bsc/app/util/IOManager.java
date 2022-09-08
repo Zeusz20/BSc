@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.network.DownloadReceiver;
@@ -63,6 +64,13 @@ public final class IOManager {
 
     public static boolean fileExists(Activity ctx, String filename) {
         return listProjects(ctx).stream().anyMatch(it -> it.getName().equals(filename));
+    }
+
+    public static void moveProjects(Activity ctx) throws NullPointerException {
+        for(File file: Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).listFiles()) {
+            if(file.getName().endsWith(".gwp"))
+                file.renameTo(new File(ctx.getExternalFilesDir(PROJECT_DIR), file.getName()));
+        }
     }
 
     public static List<File> listProjects(Activity ctx) {

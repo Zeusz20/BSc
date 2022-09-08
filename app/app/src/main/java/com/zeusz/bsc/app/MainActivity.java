@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat;
 import com.zeusz.bsc.app.dialog.GameDialog;
 import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.ui.ViewManager;
+import com.zeusz.bsc.app.util.IOManager;
 import com.zeusz.bsc.core.Localization;
 
 
@@ -32,18 +33,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        if(client != null && client.isDirty())
-            new GameDialog(this, Localization.localize("game.player_disconnected")).show();
+    protected void onStart() {
+        super.onStart();
 
-        setGameClient(null);
-        super.onPause();
+        try {
+            // TODO send manually added projects to opponent
+            IOManager.moveProjects(this);
+        }
+        catch(Exception e) {
+            ViewManager.toast(this, Localization.localize("system.import_failed"));
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         ViewManager.show(this, ViewManager.MAIN_MENU);
+    }
+
+    @Override
+    protected void onPause() {
+        if(client != null && client.isDirty())
+            new GameDialog(this, Localization.localize("game.player_disconnected")).show();
+
+        setGameClient(null);
+        super.onPause();
     }
 
     @Override

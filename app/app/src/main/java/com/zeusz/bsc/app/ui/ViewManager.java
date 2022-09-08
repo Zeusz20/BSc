@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,9 +67,11 @@ public final class ViewManager {
     }
 
     public static void toast(Context context, String message) {
-        ((Activity) context).runOnUiThread(() -> {
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-        });
+        if(context instanceof ContextThemeWrapper)
+            context = ((ContextThemeWrapper) context).getBaseContext();
+
+        final Activity ctx = (Activity) context;
+        ctx.runOnUiThread(() -> Toast.makeText(ctx, message, Toast.LENGTH_LONG).show());
     }
 
     public static List<View> findViewsByTag(View root, String tag) {

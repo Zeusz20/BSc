@@ -32,7 +32,7 @@ public class DownloadReceiver extends BroadcastReceiver {
          * If game client isn't running (null) show toast message,
          * because download was initiated from the JS browser. */
         if(ctx.getGameClient() == null)
-            ViewManager.toast(ctx, Localization.localize("browser.download_complete"));
+            ViewManager.toast(ctx, Localization.localize("net.download_complete"));
     }
 
     @Override
