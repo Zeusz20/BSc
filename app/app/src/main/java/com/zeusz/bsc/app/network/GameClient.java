@@ -77,8 +77,7 @@ public class GameClient extends Channel {
 
     public GameClient(Activity ctx, Project project) throws Exception {
         super(ctx);
-        this.game = new Game(project);
-        this.opponentReady = false;
+        game = new Game(ctx, project);
     }
 
     public void setMeta(boolean isHost, String id) {
@@ -101,7 +100,7 @@ public class GameClient extends Channel {
 
         try {
             // player has chosen an object, inform opponent about it
-            handshake(SERVER_INFO.getString("ready"), id);
+            send(SERVER_INFO.getString("ready"));
         }
         catch(Exception e) {
             ctx.setGameClient(null);
@@ -167,8 +166,18 @@ public class GameClient extends Channel {
      * The connection is established when the server sends the "ready" response.
      * */
     protected void wait(String response) throws Exception {
-        if(SERVER_INFO.getString("ready").equals(response))
-            load(null);  // start game
+        if(SERVER_INFO.getString("download").equals(response)) {
+            // send project to joining player
+            byte[] file = IOManager.getFileBytes(game.getProject().getSource());
+            send(SERVER_INFO.getString("download"));  // signal server the beginning of file transfer
+            System.out.println(IOManager.bytesToString(file));
+            send(IOManager.bytesToString(file));
+            send(SERVER_INFO.getString("over"));  // signal end of file transfer
+        }
+        else if(SERVER_INFO.getString("ready").equals(response)) {
+            // start game
+            load(null);
+        }
     }
 
     /**
@@ -177,11 +186,24 @@ public class GameClient extends Channel {
      * {@link #load(String)} method will load the project and the client's
      * state will be changed to IN_GAME.
      * */
-    protected void download(String filename) throws Exception {
+    protected void download(String response) throws Exception {
         if(!isHost) {
-            String encoded = URLEncoder.encode(filename, SERVER_INFO.getString("format"));
-            String url = Cloud.getCloudUrl("/projects/" + encoded);
-            IOManager.download(ctx, url);  // download project file if missing
+            if(response.equals(SERVER_INFO.getString("over"))) {
+                // file bytes received
+                IOManager.getFileWriter().close();
+                send(SERVER_INFO.getString("over"));
+                load(IOManager.getFileWriter().getFile().getName());
+            }
+            else if(!response.endsWith(".gwp")) {  // if response is not a filename
+                // save file bytes from host
+                IOManager.getFileWriter().write(response);
+            }
+            else {
+                // download project from server
+                String encoded = URLEncoder.encode(response, SERVER_INFO.getString("encoding"));
+                String url = Cloud.getCloudUrl("/projects/" + encoded);
+                IOManager.download(ctx, url);  // download project file if missing
+            }
         }
     }
 
@@ -189,16 +211,32 @@ public class GameClient extends Channel {
      * Loads the project to memory.
      * If joining player doesn't have the project file, this method is invoked
      * by the {@link DownloadReceiver} class when the project is finished downloading.
+     *
+     * If the download fails, meaning the host player is using a manually
+     * added project, which is not present on the server, request the project
+     * to be transferred and handle it in the FILE_DOWNLOAD state.
      * */
     public void load(String filename) throws Exception {
         // host already has the project loaded
         if(!isHost) {
             game.loadProject(ctx, filename);
-            handshake(SERVER_INFO.getString("ready"), id);
+
+            if(game.getProject() == null) {  // download failed, other player is using a manually added project
+                if(IOManager.getFileWriter().isOpen()) {  // request file transfer ONCE, if it fails the first time disconnect
+                    IOManager.getFileWriter().init(ctx, filename);
+                    setState(State.FILE_DOWNLOAD);
+                    send(SERVER_INFO.getString("download"));
+                }
+            }
+            else {
+                send(SERVER_INFO.getString("ready"));
+            }
         }
 
-        setState(State.IN_GAME);
-        ViewManager.show(ctx, ViewManager.OBJECT_SELECTION);
+        if(game.getProject() != null) {
+            setState(State.IN_GAME);
+            ViewManager.show(ctx, ViewManager.OBJECT_SELECTION);
+        }
     }
 
     /**
@@ -222,9 +260,6 @@ public class GameClient extends Channel {
     }
 
     public void sendJSON(Dictionary message) {
-        // add identification info
-        message.put("is_host", isHost).put("game_id", id);
-
         try { send(message.toString()); }
         catch(Exception e) { ctx.setGameClient(null); }
     }

@@ -13,8 +13,11 @@ import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.network.DownloadReceiver;
 import com.zeusz.bsc.core.Project;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -22,13 +25,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public final class IOManager {
 
-    private static final String PROJECT_DIR = "projects";
+    /* FileWriter singleton */
+    private static final FileWriter FILE_WRITER = new FileWriter();
+    public static FileWriter getFileWriter() { return FILE_WRITER; }
 
+    /* IOManager */
     private IOManager() { }
+
+    public static final String PROJECT_DIR = "projects";
 
     public static String encodeString(String string) {
         try { return URLEncoder.encode(string, StandardCharsets.UTF_8.name()); }
@@ -64,6 +73,18 @@ public final class IOManager {
 
     public static boolean fileExists(Activity ctx, String filename) {
         return listProjects(ctx).stream().anyMatch(it -> it.getName().equals(filename));
+    }
+
+    public static byte[] getFileBytes(File file) {
+        try(FileInputStream stream = new FileInputStream(file)) {
+            byte[] bytes = new byte[stream.available()];
+
+            stream.read(bytes);
+            return bytes;
+        }
+        catch(IOException e) {
+            return new byte[0];
+        }
     }
 
     public static void moveProjects(Activity ctx) throws NullPointerException {
@@ -102,6 +123,73 @@ public final class IOManager {
 
     public static Bitmap getImage(byte[] bytes) {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    /** @return A string representation of a byte array. */
+    public static String bytesToString(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+
+        for(byte b: bytes)
+            builder.append(b).append(',');
+
+        return builder.toString();
+    }
+
+    /** @return Converts a string representation back to a byte array. */
+    public static byte[] stringToBytes(String string) {
+        List<String> values = Arrays.stream(string.split(",")).filter(it -> !it.equals("")).collect(Collectors.toList());
+        byte[] bytes = new byte[values.size()];
+
+        for(int i = 0; i < values.size(); i++)
+            bytes[i] = Byte.parseByte(values.get(i));
+
+        return bytes;
+    }
+
+    /**
+     * Singleton wrapper class for FileOutputStream.
+     * Used when transferring files between devices.
+     *  */
+    public static final class FileWriter implements Closeable {
+        private File file;
+        private FileOutputStream stream;
+        private boolean open;
+        private StringBuilder buffer;
+
+        private FileWriter() { open = true; }
+
+        public void init(Activity ctx, String filename) throws IOException {
+            String dir = ctx.getExternalFilesDir(IOManager.PROJECT_DIR).getAbsolutePath();
+
+            file = new File(dir, filename);
+            if(file.exists()) file.delete();
+
+            if(stream != null) stream.close();
+            stream = new FileOutputStream(file);
+            buffer = new StringBuilder();
+            open = true;
+        }
+
+        public void write(String bytes) {
+            buffer.append(bytes);
+        }
+
+        @Override
+        public void close() throws IOException {
+            open = false;
+
+            // remove trailing white space
+            buffer.deleteCharAt(buffer.length() - 1);
+
+            if(stream != null) {
+                stream.write(IOManager.stringToBytes(buffer.toString()));
+                stream.close();
+                stream = null;
+            }
+        }
+
+        public boolean isOpen() { return open; }
+        public File getFile() { return file; }
     }
 
 }

@@ -2,6 +2,8 @@ package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
 
+import androidx.annotation.Nullable;
+
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.dialog.AnswerDialog;
@@ -38,8 +40,9 @@ public final class Game {
     private Project project;
     private Object object;
 
-    public Game(Project project) {
-        this.project = project;
+    public Game(Activity ctx, @Nullable Project project) {
+        if(project != null)
+            loadProject(ctx, project.getSource().getName());
     }
 
     public void loadProject(Activity ctx, String filename) {

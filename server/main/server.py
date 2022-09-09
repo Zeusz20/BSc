@@ -5,18 +5,21 @@ SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
     'port': 5050,
     'buffer': 1024,  # 1kB
-    'format': 'utf-8',
+    'encoding': 'utf-8',
+    'wait': 50,  # millis
 
     'create': '$_create',           # create new game
     'join': '$_join',               # connect to game
-    'start': '$_start',             # players can communicate
-    'ready': '$_ready',             # joining player is ready
+    'download': '$_download',       # joining player requested the project file
+    'over': '$_over',               # host player has sent the project file
+    'ready': '$_ready',             # player is ready to play
     'disconnect': '$_disconnect',   # disconnect from game
     'invalid': '$_invalid',         # invalid game id
     'id_pattern': '^[A-Z0-9]{4}$',
 }
 
 _CLOSE_MESSAGES = (SERVER_INFO['disconnect'], '', None)
+_FILE_TRANSFER_MESSAGE = (SERVER_INFO['download'], SERVER_INFO['over'])
 
 
 class Server:
@@ -41,59 +44,55 @@ class Server:
             client_thread.start()
 
     def send(self, connection, address, data):
-        message = (data + '\n').encode(SERVER_INFO['format'])
+        message = (data + '\n').encode(SERVER_INFO['encoding'])
         print('[SEND]', address, message)
         connection.sendto(message, address)
 
     def receive(self, connection, address):
-        message = connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['format']).strip()
+        message = connection.recv(SERVER_INFO['buffer']).decode(SERVER_INFO['encoding'])
         print('[RECV]', address, message)
         return message
 
-    def close(self, address):
-        def disconnect(game_id, player):
-            other = 'host' if player == 'join' else 'join'
-            self._clients[game_id][player]['connection'].close()
-            self._clients[game_id][player]['connection'] = None
-            self._clients[game_id][player]['address'] = None
+    def close(self, storage):
+        game_id = storage['game_id']
+        player = 'host' if storage['is_host'] else 'join'
+        other = 'join' if storage['is_host'] else 'host'
 
-            # disconnect other player if they're still connected
-            if self._clients[game_id][other]['connection']:
-                self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
+        self._clients[game_id][player]['connection'].close()
+        self._clients[game_id][player]['connection'] = None
+        self._clients[game_id][player]['address'] = None
 
-        for game_id in self._clients:
-            if address == self._clients[game_id]['host']['address']:
-                disconnect(game_id, 'host')
-            elif address == self._clients[game_id]['join']['address']:
-                disconnect(game_id, 'join')
+        # disconnect other player if they're still connected
+        if self._clients[game_id][other]['connection']:
+            self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['disconnect'])
 
-            # destroy game if no player is connected
-            if self._clients[game_id]['host']['connection'] is None and self._clients[game_id]['join']['connection'] is None:
-                del self._clients[game_id]
-                print(f'[GAME] Destroyed "{game_id}" instance')
-                break
+        # destroy game if no player is connected
+        if self._clients[game_id]['host']['connection'] is None and self._clients[game_id]['join']['connection'] is None:
+            del self._clients[game_id]
+            print(f"[GAME] Instance {game_id} destroyed")
 
     def _handle_client(self, connection, address):
-        while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
-            try:
-                if message == SERVER_INFO['create']:
-                    filename = self.receive(connection, address)
-                    self._create_game(connection, address, filename)
-                elif message == SERVER_INFO['join']:
-                    game_id = self.receive(connection, address)
-                    self._join_game(connection, address, game_id)
-                elif message == SERVER_INFO['ready']:
-                    game_id = self.receive(connection, address)
-                    self._start_game(address, game_id)
-                else:
-                    self._communicate(json.loads(message))
-            
-            except json.JSONDecodeError:
-                pass
+        storage = {'game_id': None, 'is_host': None, 'file_transfer': False}
+    
+        while (message := self.receive(connection, address, storage['file_transfer'])) not in _CLOSE_MESSAGES:
+            if message == SERVER_INFO['create']:
+                filename = self.receive(connection, address)
+                self._create_game(storage, connection, address, filename)
+            elif message == SERVER_INFO['join']:
+                game_id = self.receive(connection, address)
+                self._join_game(storage, connection, address, game_id)
+            elif message == SERVER_INFO['ready']:
+                self._communicate(storage, SERVER_INFO['ready'])
+            elif message in _FILE_TRANSFER_MESSAGE:
+                self._transfer_file(storage, message)
+            else:
+                # handle file transfer and in-game communication
+                json_encode = not storage['file_transfer']
+                self._communicate(storage, message, json_encode)
 
-        self.close(address)
+        self.close(storage)
 
-    def _create_game(self, connection, address, filename):
+    def _create_game(self, storage, connection, address, filename):
         from string import ascii_uppercase, digits
         from random import choices
 
@@ -101,6 +100,9 @@ class Server:
         self.send(connection, address, game_id)  # send back game id
 
         # create game and wait for other player
+        storage['game_id'] = game_id
+        storage['is_host'] = True
+
         self._clients[game_id] = {
             'host': {
                 'connection': connection,
@@ -113,7 +115,7 @@ class Server:
             'project': filename,
         }
 
-    def _join_game(self, connection, address, game_id):
+    def _join_game(self, storage, connection, address, game_id):
         from re import match
 
         if not match(SERVER_INFO['id_pattern'], game_id) or self._clients.get(game_id) is None:
@@ -128,14 +130,27 @@ class Server:
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], game_id)
             self.send(self._clients[game_id]['join']['connection'], self._clients[game_id]['join']['address'], project)
 
-    def _start_game(self, address, game_id):
-        other = 'host' if self._clients[game_id]['join']['address'] == address else 'join'
-        self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], SERVER_INFO['ready'])
+            storage['game_id'] = game_id
+            storage['is_host'] = False
 
-    def _communicate(self, message):
-        game_id = message.get('game_id')
-        is_host = message.get('is_host')
-        other = 'join' if is_host else 'host'
+    def _transfer_file(self, storage, message):
+        if message == SERVER_INFO['download']:
+            # joining player requests file transfer
+            if not storage['is_host']:
+                self._communicate(storage, message)
+            storage['file_transfer'] = True
+        elif message == SERVER_INFO['over']:
+            # host player finished transferring file
+            storage['file_transfer'] = False
+            if storage['is_host']:
+                self._communicate(storage, message)
 
-        if self._clients.get(game_id):
-            self.send(self._clients[game_id][other]['connection'], self._clients[game_id][other]['address'], json.dumps(message))
+    def _communicate(self, storage, message, json_encode=False):
+        other = 'join' if storage['is_host'] else 'host'
+        message = json.dumps(message) if json_encode else message
+
+        self.send(
+            self._clients[storage['game_id']][other]['connection'],
+            self._clients[storage['game_id']][other]['address'],
+            message
+        )

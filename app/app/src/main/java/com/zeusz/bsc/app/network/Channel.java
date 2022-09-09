@@ -23,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class Channel implements Closeable {
 
-    /* Static functionalities */
-    protected static final int WAIT = 20;
-
+    /* Server info */
     protected static final java.lang.Object INPUT_LOCK = new java.lang.Object();
     protected static final java.lang.Object OUTPUT_LOCK = new java.lang.Object();
 
@@ -115,10 +113,9 @@ public abstract class Channel implements Closeable {
         Thread thread = new Thread(new Task(ctx, () -> {
             synchronized(Channel.OUTPUT_LOCK) {
                 // wait for server to process previous sent message before client can send another one
-                Thread.sleep(WAIT);
+                Thread.sleep(SERVER_INFO.getInt("wait"));
 
                 writer.write(message);
-                writer.newLine();
                 writer.flush();
             }
         }));
