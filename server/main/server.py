@@ -74,7 +74,7 @@ class Server:
     def _handle_client(self, connection, address):
         storage = {'game_id': None, 'is_host': None, 'file_transfer': False}
     
-        while (message := self.receive(connection, address, storage['file_transfer'])) not in _CLOSE_MESSAGES:
+        while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
             if message == SERVER_INFO['create']:
                 filename = self.receive(connection, address)
                 self._create_game(storage, connection, address, filename)
