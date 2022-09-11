@@ -86,9 +86,7 @@ class Server:
             elif message in _FILE_TRANSFER_MESSAGE:
                 self._transfer_file(storage, message)
             else:
-                # handle file transfer and in-game communication
-                json_encode = not storage['file_transfer']
-                self._communicate(storage, message, json_encode)
+                self._communicate(storage, message)
 
         self.close(storage)
 
@@ -145,9 +143,8 @@ class Server:
             if storage['is_host']:
                 self._communicate(storage, message)
 
-    def _communicate(self, storage, message, json_encode=False):
+    def _communicate(self, storage, message):
         other = 'join' if storage['is_host'] else 'host'
-        message = json.dumps(message) if json_encode else message
 
         self.send(
             self._clients[storage['game_id']][other]['connection'],

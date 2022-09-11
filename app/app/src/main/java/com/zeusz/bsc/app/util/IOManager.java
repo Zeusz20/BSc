@@ -31,8 +31,9 @@ import java.util.stream.Collectors;
 public final class IOManager {
 
     /* FileWriter singleton */
-    private static final FileWriter FILE_WRITER = new FileWriter();
-    public static FileWriter getFileWriter() { return FILE_WRITER; }
+    private static FileWriter writer = new FileWriter();
+    public static FileWriter getFileWriter() { return writer; }
+    public static void resetFileWriter() { writer = new FileWriter(); }
 
     /* IOManager */
     private IOManager() { }
@@ -125,32 +126,13 @@ public final class IOManager {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    /** @return A string representation of a byte array. */
-    public static String bytesToString(byte[] bytes) {
-        StringBuilder builder = new StringBuilder();
-
-        for(byte b: bytes)
-            builder.append(b).append(',');
-
-        return builder.toString();
-    }
-
-    /** @return Converts a string representation back to a byte array. */
-    public static byte[] stringToBytes(String string) {
-        List<String> values = Arrays.stream(string.split(",")).filter(it -> !it.equals("")).collect(Collectors.toList());
-        byte[] bytes = new byte[values.size()];
-
-        for(int i = 0; i < values.size(); i++)
-            bytes[i] = Byte.parseByte(values.get(i));
-
-        return bytes;
-    }
-
     /**
      * Singleton wrapper class for FileOutputStream.
      * Used when transferring files between devices.
      *  */
     public static final class FileWriter implements Closeable {
+        private final static String DELIMITER = ",";
+
         private File file;
         private FileOutputStream stream;
         private boolean open;
@@ -166,6 +148,7 @@ public final class IOManager {
 
             if(stream != null) stream.close();
             stream = new FileOutputStream(file);
+
             buffer = new StringBuilder();
             open = true;
         }
@@ -178,18 +161,49 @@ public final class IOManager {
         public void close() throws IOException {
             open = false;
 
-            // remove trailing white space
-            buffer.deleteCharAt(buffer.length() - 1);
-
             if(stream != null) {
-                stream.write(IOManager.stringToBytes(buffer.toString()));
+                stream.write(stringToBytes(buffer.toString()));
                 stream.close();
+                stream = null;
+            }
+        }
+
+        public void interrupt() {
+            if(open && file != null) {
+                try { close(); }
+                catch(IOException e) { /* Couldn't close stream */ }
+
+                file.delete();
                 stream = null;
             }
         }
 
         public boolean isOpen() { return open; }
         public File getFile() { return file; }
+
+        /** @return A string representation of a byte array. */
+        public String bytesToString(byte[] bytes) {
+            StringBuilder builder = new StringBuilder();
+
+            for(byte b: bytes)
+                builder.append(b).append(FileWriter.DELIMITER);
+
+            return builder.toString();
+        }
+
+        /** @return Converts a string representation back to a byte array. */
+        public byte[] stringToBytes(String string) {
+            List<String> values = Arrays.stream(string.split(FileWriter.DELIMITER))
+                    .filter(it -> !it.equals(""))
+                    .collect(Collectors.toList());
+
+            byte[] bytes = new byte[values.size()];
+
+            for(int i = 0; i < values.size(); i++)
+                bytes[i] = Byte.parseByte(values.get(i));
+
+            return bytes;
+        }
     }
 
 }

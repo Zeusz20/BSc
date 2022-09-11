@@ -12,7 +12,13 @@ import com.zeusz.bsc.core.Project;
 public class DeleteDialog extends GameDialog {
 
     public DeleteDialog(Activity ctx, Project project, ProjectListAdapter adapter) {
-        super(ctx, R.drawable.warning_48dp, Localization.localize("menu.delete_caption"), Localization.localize("menu.delete_description"));
+        super(
+            ctx,
+            R.drawable.warning_48dp,
+            Localization.localize("menu.delete_caption"),
+            String.format(Localization.localize("menu.delete_description"), project.getName())
+        );
+
         setNeutralButton(Localization.localize("word.no"), GameDialog.DISMISS);
         setPositiveButton(Localization.localize("word.yes"), (dialog, which) -> deleteProject(project, adapter));
     }

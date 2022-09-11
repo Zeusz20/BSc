@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.zeusz.bsc.app.dialog.GameDialog;
+import com.zeusz.bsc.app.dialog.LoadingDialog;
+import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.IOManager;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCompat.requestPermissions(this, PERMISSIONS, hashCode());
         Localization.init(MainActivity.class, getFilesDir().getPath());
+        JSWebView.load(this);   // preload webview for optimization purposes
     }
 
     @Override
@@ -49,10 +52,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         ViewManager.show(this, ViewManager.MAIN_MENU);
+        LoadingDialog.hide(this);
     }
 
     @Override
     protected void onPause() {
+        IOManager.getFileWriter().interrupt();
+
         if(client != null && client.isDirty())
             new GameDialog(this, Localization.localize("game.player_disconnected")).show();
 

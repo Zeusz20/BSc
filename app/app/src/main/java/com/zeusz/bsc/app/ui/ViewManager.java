@@ -154,10 +154,7 @@ public final class ViewManager {
                 break;
 
             case DOWNLOAD_MENU:
-                JSWebView browser = new JSWebView(ctx, "/user/search/?lang=" + Localization.getLocale().getLanguage());
-                browser.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-                body.addView(browser);
+                body.addView(JSWebView.getWebView());
                 footer.addView(new BackButton(ctx, MAIN_MENU));
                 break;
 

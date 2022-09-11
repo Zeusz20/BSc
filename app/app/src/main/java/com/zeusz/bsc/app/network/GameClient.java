@@ -3,6 +3,7 @@ package com.zeusz.bsc.app.network;
 import android.app.Activity;
 
 import com.zeusz.bsc.app.MainActivity;
+import com.zeusz.bsc.app.dialog.LoadingDialog;
 import com.zeusz.bsc.app.ui.Game;
 import com.zeusz.bsc.app.ui.ViewManager;
 import com.zeusz.bsc.app.util.Dictionary;
@@ -78,6 +79,7 @@ public class GameClient extends Channel {
     public GameClient(Activity ctx, Project project) throws Exception {
         super(ctx);
         game = new Game(ctx, project);
+        IOManager.resetFileWriter();
     }
 
     public void setMeta(boolean isHost, String id) {
@@ -118,6 +120,9 @@ public class GameClient extends Channel {
             if(isDirty() && SERVER_INFO.getString("disconnect").equals(response)) {
                 ctx.setGameClient(null);
                 game.exit(ctx, isDirty());
+
+                if(state == State.FILE_DOWNLOAD)
+                    IOManager.getFileWriter().interrupt();
             }
             else {
                 switch(state) {
@@ -170,8 +175,7 @@ public class GameClient extends Channel {
             // send project to joining player
             byte[] file = IOManager.getFileBytes(game.getProject().getSource());
             send(SERVER_INFO.getString("download"));  // signal server the beginning of file transfer
-            System.out.println(IOManager.bytesToString(file));
-            send(IOManager.bytesToString(file));
+            send(IOManager.getFileWriter().bytesToString(file));
             send(SERVER_INFO.getString("over"));  // signal end of file transfer
         }
         else if(SERVER_INFO.getString("ready").equals(response)) {
@@ -190,6 +194,7 @@ public class GameClient extends Channel {
         if(!isHost) {
             if(response.equals(SERVER_INFO.getString("over"))) {
                 // file bytes received
+                LoadingDialog.hide(ctx);
                 IOManager.getFileWriter().close();
                 send(SERVER_INFO.getString("over"));
                 load(IOManager.getFileWriter().getFile().getName());
@@ -223,9 +228,14 @@ public class GameClient extends Channel {
 
             if(game.getProject() == null) {  // download failed, other player is using a manually added project
                 if(IOManager.getFileWriter().isOpen()) {  // request file transfer ONCE, if it fails the first time disconnect
+                    LoadingDialog.display(ctx);
                     IOManager.getFileWriter().init(ctx, filename);
                     setState(State.FILE_DOWNLOAD);
                     send(SERVER_INFO.getString("download"));
+                }
+                else {
+                    LoadingDialog.hide(ctx);
+                    ctx.setGameClient(null);
                 }
             }
             else {
