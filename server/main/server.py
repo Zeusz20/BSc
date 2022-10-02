@@ -4,7 +4,7 @@ from threading import Thread
 SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
     'port': 5050,
-    'buffer': 1024,  # 1kB
+    'buffer': 1024 * 8,  # 8kB
     'encoding': 'utf-8',
     'wait': 50,  # millis
 
@@ -15,11 +15,12 @@ SERVER_INFO = {
     'ready': '$_ready',             # player is ready to play
     'disconnect': '$_disconnect',   # disconnect from game
     'invalid': '$_invalid',         # invalid game id
+    'ping': '$_ping',               # ping server
     'id_pattern': '^[A-Z0-9]{4}$',
 }
 
 _CLOSE_MESSAGES = (SERVER_INFO['disconnect'], '', None)
-_FILE_TRANSFER_MESSAGE = (SERVER_INFO['download'], SERVER_INFO['over'])
+_FILE_TRANSFER_MESSAGES = (SERVER_INFO['download'], SERVER_INFO['over'])
 
 
 class Server:
@@ -75,7 +76,9 @@ class Server:
         storage = {'game_id': None, 'is_host': None, 'file_transfer': False}
     
         while (message := self.receive(connection, address)) not in _CLOSE_MESSAGES:
-            if message == SERVER_INFO['create']:
+            if message == SERVER_INFO['ping']:
+                pass
+            elif message == SERVER_INFO['create']:
                 filename = self.receive(connection, address)
                 self._create_game(storage, connection, address, filename)
             elif message == SERVER_INFO['join']:
@@ -83,7 +86,7 @@ class Server:
                 self._join_game(storage, connection, address, game_id)
             elif message == SERVER_INFO['ready']:
                 self._communicate(storage, SERVER_INFO['ready'])
-            elif message in _FILE_TRANSFER_MESSAGE:
+            elif message in _FILE_TRANSFER_MESSAGES:
                 self._transfer_file(storage, message)
             else:
                 self._communicate(storage, message)

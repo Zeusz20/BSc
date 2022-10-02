@@ -77,6 +77,17 @@ public abstract class Channel implements Closeable {
         this.ctx = (MainActivity) ctx;
     }
 
+    protected boolean isServerAvailable() {
+        try {
+            writer.write(SERVER_INFO.getString("ping"));
+            writer.flush();
+            return true;
+        }
+        catch(Exception e) {
+            return false;
+        }
+    }
+
     public void connect() throws Exception {
         if(!isConnected && (socket == null || !socket.isConnected())) {
             socket = new Socket(SERVER_INFO.getString("host"), SERVER_INFO.getInt("port"));
@@ -91,7 +102,8 @@ public abstract class Channel implements Closeable {
 
         try {
             // disconnect from server
-            send(SERVER_INFO.getString("disconnect"));
+            if(isServerAvailable())
+                send(SERVER_INFO.getString("disconnect"));
         }
         catch(Exception e) {
             // couldn't disconnect cleanly from the server
