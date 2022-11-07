@@ -16,7 +16,7 @@ SERVER_INFO = {
     'disconnect': '$_disconnect',   # disconnect from game
     'invalid': '$_invalid',         # invalid game id
     'ping': '$_ping',               # ping server
-    'id_pattern': '^[A-Z0-9]{4}$',
+    'id_pattern': '^[A-Z0-9]{6}$',
 }
 
 _CLOSE_MESSAGES = (SERVER_INFO['disconnect'], '', None)
@@ -97,7 +97,7 @@ class Server:
         from string import ascii_uppercase, digits
         from random import choices
 
-        game_id = ''.join(choices(ascii_uppercase + digits, k=4))
+        game_id = ''.join(choices(ascii_uppercase + digits, k=6))
         self.send(connection, address, game_id)  # send back game id
 
         # create game and wait for other player
@@ -119,7 +119,10 @@ class Server:
     def _join_game(self, storage, connection, address, game_id):
         from re import match
 
-        if not match(SERVER_INFO['id_pattern'], game_id) or self._clients.get(game_id) is None:
+        invalid_game_id = not match(SERVER_INFO['id_pattern'], game_id) or self._clients.get(game_id) is None
+        game_occupied = self._clients.get(game_id) is not None and self._clients[game_id]['join']['connection'] is not None
+
+        if invalid_game_id or game_occupied:
             self.send(connection, address, SERVER_INFO['invalid'])
         else:
             # establish connection
@@ -135,16 +138,14 @@ class Server:
             storage['is_host'] = False
 
     def _transfer_file(self, storage, message):
-        if message == SERVER_INFO['download']:
-            # joining player requests file transfer
-            if not storage['is_host']:
-                self._communicate(storage, message)
-            storage['file_transfer'] = True
-        elif message == SERVER_INFO['over']:
-            # host player finished transferring file
-            storage['file_transfer'] = False
-            if storage['is_host']:
-                self._communicate(storage, message)
+        # joining player requests file transfer
+        join_file_transfer_request = not storage['is_host'] and message == SERVER_INFO['download']
+
+        # host player finished transferring file
+        host_file_transfer_finish = storage['is_host'] and message == SERVER_INFO['over']
+
+        if join_file_transfer_request or host_file_transfer_finish:
+            self._communicate(storage, message)
 
     def _communicate(self, storage, message):
         other = 'join' if storage['is_host'] else 'host'

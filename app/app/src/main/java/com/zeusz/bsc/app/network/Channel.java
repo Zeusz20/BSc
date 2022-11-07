@@ -79,8 +79,7 @@ public abstract class Channel implements Closeable {
 
     protected boolean isServerAvailable() {
         try {
-            writer.write(SERVER_INFO.getString("ping"));
-            writer.flush();
+            send(SERVER_INFO.getString("ping"));
             return true;
         }
         catch(Exception e) {
@@ -99,14 +98,18 @@ public abstract class Channel implements Closeable {
 
     public void disconnect() {
         isConnected = false;
+        System.out.println("disconnecting game client");
 
         try {
             // disconnect from server
             if(isServerAvailable())
                 send(SERVER_INFO.getString("disconnect"));
+            else
+                System.out.println("server is not available");
         }
         catch(Exception e) {
             // couldn't disconnect cleanly from the server
+            e.printStackTrace();
         }
         finally {
             try { close(); }

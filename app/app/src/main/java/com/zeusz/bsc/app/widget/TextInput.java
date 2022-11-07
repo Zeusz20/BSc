@@ -14,7 +14,7 @@ import com.zeusz.bsc.app.R;
 
 public class TextInput extends AppCompatEditText {
 
-    private static final InputFilter MAX_LENGTH = new InputFilter.LengthFilter(4);
+    private static final InputFilter MAX_LENGTH = new InputFilter.LengthFilter(6);
 
     public TextInput(Context context, AttributeSet attrs) {
         super(context, attrs);
