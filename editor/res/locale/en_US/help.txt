@@ -1,8 +1,14 @@
 [object]
-Something about objects.
+Both players choose an object at the beginning of the game.
+Each object has a set of attributes and an image which describes them.
 
 [attribute]
-Something about attributes.
+Attributes are generalized properties of objects.
+The values describe the specific properties which the objects possess,
+i.e. color - red.
+
+The question, which asks about the attribute, must contain the word "{$attr}"
+where the application will substitute a value chosen by the player.
 
 [question]
 Something about questions.

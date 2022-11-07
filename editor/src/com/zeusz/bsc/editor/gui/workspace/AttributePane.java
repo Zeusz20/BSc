@@ -2,16 +2,15 @@ package com.zeusz.bsc.editor.gui.workspace;
 
 import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Localization;
-import com.zeusz.bsc.editor.gui.Box;
-import com.zeusz.bsc.editor.gui.IconButton;
-import com.zeusz.bsc.editor.gui.Prompt;
-import com.zeusz.bsc.editor.gui.Style;
-import com.zeusz.bsc.editor.gui.workspace.form.*;
+import com.zeusz.bsc.editor.gui.*;
+import com.zeusz.bsc.editor.gui.workspace.form.ItemList;
+import com.zeusz.bsc.editor.gui.workspace.form.Row;
+import com.zeusz.bsc.editor.gui.workspace.form.TextInput;
+import com.zeusz.bsc.editor.gui.workspace.form.ValueRow;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.Priority;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,12 +32,15 @@ public class AttributePane extends Workspace<Attribute> {
 
     private Box initQuestionBox() {
         TextInput textInput = new TextInput(item.getQuestion());
-        IconButton iconButton = new IconButton("img/del.png");
+        IconButton substitutionBtn = new IconButton("img/substitute.png");
+        IconButton deleteBtn = new IconButton("img/del.png");
 
         fields.add(textInput);
-        iconButton.setOnAction(click -> textInput.setText(""));
+        substitutionBtn.setOnAction(click -> textInput.setText(textInput.getText() + "{$attr}"));
+        substitutionBtn.setTooltip(new FastTooltip(Localization.localize("form.insert_substitution")));
+        deleteBtn.setOnAction(click -> textInput.setText(""));
 
-        return new Box(new Row(new Prompt(Localization.prompt("word.question")), textInput, iconButton));
+        return new Box(new Row(new Prompt(Localization.prompt("word.question")), substitutionBtn, textInput, deleteBtn));
     }
 
     private Box initValueBox() {

@@ -1,8 +1,14 @@
 [object]
-Objektum leírás.
+A játék kezdetekor mindkét játékos választ egy objektumot.
+Minden objektum rendelkezik bizonyos tulajdonságokkal és egy képpel, ami az objektumot jelképezi.
 
 [attribute]
-Tulajdonság leírás.
+A tulajdonságok az objektum általánosított jellemzői.
+Az értékek egy specifikus jellemzőt írnak le, amivel az objektum rendelkezik,
+pl.: szín - piros.
+
+A kérdésnek, mely rákérdez a tulajdonságra, tartalmaznia kell egy "{$attr}" karaktersorozatok,
+ahova az alkalmazás be fogja helyettesíteni a játékos által választott értéket.
 
 [question]
 Kérdés leírás.
