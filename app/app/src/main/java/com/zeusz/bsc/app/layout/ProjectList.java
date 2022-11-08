@@ -3,14 +3,13 @@ package com.zeusz.bsc.app.layout;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ListView;
 
 import com.zeusz.bsc.app.adapter.ProjectListAdapter;
 import com.zeusz.bsc.app.network.GameClient;
 import com.zeusz.bsc.app.util.IOManager;
 
 
-public class ProjectList extends ListView {
+public class ProjectList extends AttachedListView {
 
     public ProjectList(Context context, AttributeSet attrs) {
         super(context, attrs);

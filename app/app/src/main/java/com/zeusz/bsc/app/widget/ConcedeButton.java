@@ -18,6 +18,7 @@ public class ConcedeButton extends MenuButton {
     public ConcedeButton(Activity ctx) {
         super(ctx, Localization.localize("game.concede"), () -> new ConcedeDialog(ctx).show());
         setId(R.id.back_button);
+        setBackgroundResource(R.drawable.negative_btn_bg);
     }
 
 }

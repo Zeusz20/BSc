@@ -2,27 +2,26 @@ package com.zeusz.bsc.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.text.Editable;
 import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.zeusz.bsc.app.MainActivity;
 import com.zeusz.bsc.app.R;
 import com.zeusz.bsc.app.adapter.ValueListAdapter;
 import com.zeusz.bsc.app.dialog.AttributeListDialog;
+import com.zeusz.bsc.app.dialog.GameDialog;
 import com.zeusz.bsc.app.layout.HistoryLayout;
 import com.zeusz.bsc.app.layout.JSWebView;
 import com.zeusz.bsc.app.layout.LanguageChooser;
@@ -134,16 +133,9 @@ public final class ViewManager {
                 break;
 
             case PROJECTS_MENU:
-                ProjectList chooser = new ProjectList(ctx);
-                LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-                params.setMargins(4, 0, 4, 0);
-                chooser.setLayoutParams(params);
-
                 header.addView(new Label(ctx, Localization.localize("menu.choose_project")));
                 body.setGravity(Gravity.NO_GRAVITY);
-                body.setBackgroundColor(Color.WHITE);
-                body.addView(chooser);
+                body.addView(new ProjectList(ctx));
                 footer.addViews(new BackButton(ctx, MAIN_MENU));
                 break;
 
@@ -181,17 +173,18 @@ public final class ViewManager {
                 break;
 
             case GAME_SCREEN:
-                header.addViews(
-                        inflate(ctx, R.layout.selected_object),
-                        new SendButton(ctx, Localization.localize("game.guess"), true)
+                View questionLayout = inflate(ctx, R.layout.question_layout);
+                ViewGroup wrapper = questionLayout.findViewById(R.id.button_wrapper);
+                wrapper.addView(new SendButton(ctx, Localization.localize("game.ask_question"), false, true));
+
+                header.addViews(inflate(ctx, R.layout.selected_object));
+                body.addViews(questionLayout);
+                footer.addViews(
+                        new Label(ctx, Localization.localize("game.history"), 16.0f),
+                        new HistoryLayout(ctx),
+                        new SendButton(ctx, Localization.localize("game.guess"), true, false),
+                        new ConcedeButton(ctx)
                 );
-                body.addViews(
-                        inflate(ctx, R.layout.question_layout),
-                        new SendButton(ctx, Localization.localize("game.ask_question"), false),
-                        new Label(ctx, Localization.localize("game.history"), 12.0f),
-                        new HistoryLayout(ctx)
-                );
-                footer.addView(new ConcedeButton(ctx));
                 break;
         }
     }
@@ -205,10 +198,16 @@ public final class ViewManager {
 
         // couldn't use switch because resource ids are not final
         if(layoutId == R.layout.selected_object) {
+            ImageView help = root.findViewById(R.id.help_button);
             ImageView image = root.findViewById(R.id.selected_object_image);
             TextView name = root.findViewById(R.id.selected_object_name);
             ImageView info = root.findViewById(R.id.info_button);
 
+            help.setOnClickListener(view -> {
+                new GameDialog(ctx, R.drawable.icon,
+                        Localization.localize("game.help_caption"), Localization.localize("game.help")
+                ).show();
+            });
             image.setImageBitmap(IOManager.getImage(object.getImage()));
             name.setText(object.getName());
             info.setOnClickListener(view -> new AttributeListDialog(ctx, object).show());
@@ -217,11 +216,11 @@ public final class ViewManager {
             Attribute attribute = project.getItemList(Attribute.class).get(0); // default to 1st attribute in project
 
             // attribute selection
-            TextView caption = root.findViewById(R.id.selected_attribute_caption);
+            //TextView caption = root.findViewById(R.id.selected_attribute_caption);
             TextView name = root.findViewById(R.id.selected_attribute_name);
             Button selectBtn = root.findViewById(R.id.select_attribute_button);
 
-            caption.setText(Localization.localize("game.selected_attribute_caption"));
+            //caption.setText(Localization.localize("game.selected_attribute_caption"));
             name.setText(attribute.getName());
             selectBtn.setText(Localization.localize("game.attributes"));
             selectBtn.setOnClickListener(view -> new AttributeListDialog(ctx, null).show());

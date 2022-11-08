@@ -2,10 +2,13 @@ package com.zeusz.bsc.app.widget;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup.MarginLayoutParams;
 
 import androidx.appcompat.widget.AppCompatButton;
+
+import com.zeusz.bsc.app.R;
 
 
 public class MenuButton extends AppCompatButton {
@@ -16,8 +19,15 @@ public class MenuButton extends AppCompatButton {
 
     public MenuButton(Activity ctx, String text, Runnable onClick) {
         this(ctx, (AttributeSet) null);
-        setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
+        MarginLayoutParams layoutParams;
+        layoutParams = new MarginLayoutParams(MarginLayoutParams.MATCH_PARENT, MarginLayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(8, 8, 8, 8);
+
+        setLayoutParams(layoutParams);
+        setBackgroundResource(R.drawable.neutral_btn_bg);
         setOnClickListener(root -> onClick.run());
+        setTextColor(Color.WHITE);
         setText(text);
     }
 

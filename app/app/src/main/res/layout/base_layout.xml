@@ -5,7 +5,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_red_dark"
+    android:background="@drawable/app_background"
     android:padding="8dp">
 
     <com.zeusz.bsc.app.layout.MenuLayout
@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="24dp"
+        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +26,7 @@
         android:layout_height="680dp"
         android:orientation="vertical"
         android:gravity="center"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/footer_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +38,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginBottom="12dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

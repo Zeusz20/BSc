@@ -2,6 +2,7 @@ package com.zeusz.bsc.app.widget;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -46,17 +47,18 @@ public class SendButton extends MenuLayout {
 
     /* Class fields and methods */
     protected String text;
-    protected boolean isGuess;
+    protected boolean isGuess, showWaiting;
 
     public SendButton(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SendButton(Activity ctx, String text, boolean isGuess) {
+    public SendButton(Activity ctx, String text, boolean isGuess, boolean showWaiting) {
         super(ctx, LinearLayout.VERTICAL);
 
-        this.text = text;
+        this.text = text.toUpperCase();
         this.isGuess = isGuess;
+        this.showWaiting = showWaiting;
 
         setTag(ctx.getResources().getString(R.string.send_button));
         toggle(ctx);
@@ -71,13 +73,16 @@ public class SendButton extends MenuLayout {
                 if(isGuess) guessObject(ctx);
                 else askQuestion(ctx);
             });
-
+            button.setBackgroundResource(R.drawable.positive_btn_bg);
             ctx.runOnUiThread(() -> addView(button));
         }
         else {
             /* The button itself */
+            MarginLayoutParams layoutParams = new MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 8, 0, 8);
+
             LinearLayout wrapper = new LinearLayout(new ContextThemeWrapper(ctx, android.R.style.Widget_Holo_Light_Button));
-            wrapper.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            wrapper.setLayoutParams(layoutParams);
             wrapper.setOrientation(LinearLayout.HORIZONTAL);
             wrapper.setTextAlignment(LinearLayout.TEXT_ALIGNMENT_CENTER);
             wrapper.setEnabled(false);
@@ -89,10 +94,11 @@ public class SendButton extends MenuLayout {
 
             TextView textView = new TextView(ctx);
             textView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            textView.setText(Localization.localize("game.waiting_for_player"));
+            textView.setText(showWaiting ? Localization.localize("game.waiting_for_player") : text);
+            textView.setTextColor(Color.WHITE);
 
             // render button
-            wrapper.addView(progressBar);
+            if(showWaiting) wrapper.addView(progressBar);
             wrapper.addView(textView);
             ctx.runOnUiThread(() -> addView(wrapper));
         }

@@ -5,15 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/white"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="8"
-        android:background="@color/white">
+        android:layout_weight="8">
 
         <TextView
             android:id="@+id/project_item_name"

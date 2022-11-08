@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         try {
-            // TODO send manually added projects to opponent
             IOManager.moveProjects(this);
         }
         catch(Exception e) {

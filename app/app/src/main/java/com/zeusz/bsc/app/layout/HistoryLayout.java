@@ -23,7 +23,7 @@ public class HistoryLayout extends ListView {
 
         setPadding(padding, padding, padding, padding);
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, ViewManager.pixelsToDip(ctx, 255)));
-        setBackgroundResource(R.drawable.border);
+        setBackgroundResource(R.drawable.adapter_bg);
         setAdapter(new HistoryAdapter(ctx));
         setId(R.id.history_layout);
     }

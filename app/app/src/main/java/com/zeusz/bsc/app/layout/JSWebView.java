@@ -21,6 +21,7 @@ public class JSWebView extends WebView {
     private static JSWebView webView;
 
     public static void load(Activity ctx) {
+        // load browser
         webView = new JSWebView(ctx, "/user/search/?lang=" + Localization.getLocale().getLanguage());
         webView.setLayoutParams(
             new LinearLayout.LayoutParams(

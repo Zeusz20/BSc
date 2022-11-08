@@ -27,6 +27,7 @@ public class BackButton extends MenuButton {
         });
 
         setId(R.id.back_button);
+        setBackgroundResource(R.drawable.negative_btn_bg);
     }
 
 }
