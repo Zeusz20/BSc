@@ -198,19 +198,19 @@ public final class ViewManager {
 
         // couldn't use switch because resource ids are not final
         if(layoutId == R.layout.selected_object) {
-            ImageView help = root.findViewById(R.id.help_button);
+            ImageView info = root.findViewById(R.id.info_button);
             ImageView image = root.findViewById(R.id.selected_object_image);
             TextView name = root.findViewById(R.id.selected_object_name);
-            ImageView info = root.findViewById(R.id.info_button);
+            Button help = root.findViewById(R.id.help_button);
 
+            info.setOnClickListener(view -> new AttributeListDialog(ctx, object).show());
+            image.setImageBitmap(IOManager.getImage(object.getImage()));
+            name.setText(object.getName());
             help.setOnClickListener(view -> {
                 new GameDialog(ctx, R.drawable.icon,
                         Localization.localize("game.help_caption"), Localization.localize("game.help")
                 ).show();
             });
-            image.setImageBitmap(IOManager.getImage(object.getImage()));
-            name.setText(object.getName());
-            info.setOnClickListener(view -> new AttributeListDialog(ctx, object).show());
         }
         else if(layoutId == R.layout.question_layout) {
             Attribute attribute = project.getItemList(Attribute.class).get(0); // default to 1st attribute in project

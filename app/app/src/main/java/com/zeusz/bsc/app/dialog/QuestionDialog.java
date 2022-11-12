@@ -14,10 +14,11 @@ public class QuestionDialog extends GameDialog {
     public QuestionDialog(Activity ctx, Attribute attribute, String value, String question) {
         super(ctx, question);
 
-        boolean answer = Game.objectHasAttribute((MainActivity) ctx, attribute, value);
+        Boolean answer = Game.objectHasAttribute((MainActivity) ctx, attribute, value);
+        String caption = (answer == null) ? "word.maybe" : answer ? "word.yes" : "word.no";
 
         setCancelable(false);
-        setPositiveButton(Localization.localize(answer ? "word.yes" : "word.no"), (dialog, which) -> {
+        setPositiveButton(Localization.localize(caption), (dialog, which) -> {
             ((MainActivity) ctx).getGameClient().sendJSON(new Dictionary()
                 .put("attribute", attribute.getName())
                 .put("value", value)

@@ -18,9 +18,11 @@ import com.zeusz.bsc.core.Attribute;
 import com.zeusz.bsc.core.Item;
 import com.zeusz.bsc.core.Localization;
 import com.zeusz.bsc.core.Object;
+import com.zeusz.bsc.core.Pair;
 import com.zeusz.bsc.core.Project;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public final class Game {
@@ -31,9 +33,22 @@ public final class Game {
         return items.stream().filter(it -> it.getName().equals(name)).findAny().get();
     }
 
-    public static boolean objectHasAttribute(MainActivity ctx, Attribute attribute, String value) {
+    public static Boolean objectHasAttribute(MainActivity ctx, Attribute attribute, String value) {
         Object object = ctx.getGameClient().getGame().getObject();
-        return object.getAttributes().stream().anyMatch(it -> it.getKey().equals(attribute) && it.getValue().equals(value));
+
+        // check if attribute is present
+        Optional<Pair<Attribute, String>> attrValue = object.getAttributes().stream()
+                .filter(it -> it.getKey().equals(attribute))
+                .findAny();
+
+        if(attrValue.isPresent()) {
+            // object has the attribute but not necessarily equals to the given value
+            return object.getAttributes().stream().anyMatch(it -> it.getKey().equals(attribute) && it.getValue().equals(value));
+        }
+        else {
+            // object does not have the attribute
+            return null;
+        }
     }
 
     /* Class fields and methods */
@@ -65,9 +80,9 @@ public final class Game {
      *  3) guess
      */
     public void update(Activity ctx, Dictionary data) {
-        if(data.getBoolean("answer") != null) {
+        if(data.hasKey("answer")) { // answer CAN BE null
             // player got an answer for their question/guess
-            boolean answer = data.getBoolean("answer");
+            Boolean answer = data.getBoolean("answer");
             HistoryLayout history = ctx.findViewById(R.id.history_layout);
 
             if(data.getString("object") != null) {

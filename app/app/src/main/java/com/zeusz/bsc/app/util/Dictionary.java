@@ -27,7 +27,7 @@ public class Dictionary {
 
     /* Allows chaining */
     public Dictionary put(@NonNull String name, @Nullable Object value) {
-        try { json.put(name, value); }
+        try { json.put(name, (value == null) ? JSONObject.NULL : value); }
         catch(JSONException e) { /* couldn't add key-value pair */ }
 
         return this;
@@ -43,8 +43,13 @@ public class Dictionary {
     }
 
     protected java.lang.Object get(@NonNull String name) {
-        try { return json.get(name); }
-        catch(JSONException e) { return null; }
+        try {
+            java.lang.Object value = json.get(name);
+            return (value == JSONObject.NULL) ? null : value;
+        }
+        catch(JSONException e) {
+            return null;
+        }
     }
 
     public String getString(@NonNull String name) {
@@ -57,6 +62,10 @@ public class Dictionary {
 
     public Boolean getBoolean(@NonNull String name) {
         return (Boolean) get(name);
+    }
+
+    public boolean hasKey(String key) {
+        return json.has(key);
     }
 
     @NonNull

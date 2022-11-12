@@ -7,5 +7,8 @@
         android:width="24dp"
         android:height="24dp" />
 
-    <solid android:color="@color/white" />
+    <stroke android:color="@color/black"
+        android:width="1dp" />
+
+    <solid android:color="@color/light_gray" />
 </shape>

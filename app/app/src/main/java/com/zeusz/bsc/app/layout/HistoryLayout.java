@@ -28,7 +28,7 @@ public class HistoryLayout extends ListView {
         setId(R.id.history_layout);
     }
 
-    public void add(Activity ctx, String questionOrObject, boolean answer) {
+    public void add(Activity ctx, String questionOrObject, Boolean answer) {
         ctx.runOnUiThread(() -> {
             HistoryAdapter adapter = (HistoryAdapter) getAdapter();
             adapter.add(new Pair<>(questionOrObject, answer));

@@ -51,23 +51,14 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/help_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center"
-        android:background="@drawable/circular_layout">
-
-        <ImageView
-            android:id="@+id/help_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/help_24dp"
-            android:contentDescription="@string/help_btn_image"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:background="@drawable/special_btn_bg"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:text="\?" />
 
 </LinearLayout>

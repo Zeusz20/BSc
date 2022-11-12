@@ -3,7 +3,6 @@
     <string name="object_image">Image of the object</string>
     <string name="delete_btn_image">Image of a bin</string>
     <string name="info_btn_image">Image of the letter i</string>
-    <string name="help_btn_image">Image of a question mark</string>
     <string name="history_icon">Right/Wrong icon</string>
     <string name="ok">OK</string>
     <string name="send_button">SEND_BUTTON_TAG</string>

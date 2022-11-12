@@ -23,7 +23,13 @@ public class HistoryAdapter extends Adapter<Pair<String, Boolean>> {
         ImageView imageView = view.findViewById(R.id.history_item_icon);
         TextView textView = view.findViewById(R.id.history_item_text);
 
-        imageView.setImageResource(item.getValue() ? R.drawable.positive_feedback : R.drawable.negative_feedback);
+        int resource = (item.getValue() == null)
+                ? R.drawable.neutral_feedback
+                : item.getValue()
+                    ? R.drawable.positive_feedback
+                    : R.drawable.negative_feedback;
+
+        imageView.setImageResource(resource);
         textView.setText(item.getKey());
 
         return view;
