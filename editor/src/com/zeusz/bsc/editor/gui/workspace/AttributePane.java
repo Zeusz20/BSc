@@ -36,7 +36,7 @@ public class AttributePane extends Workspace<Attribute> {
         IconButton deleteBtn = new IconButton("img/del.png");
 
         fields.add(textInput);
-        substitutionBtn.setOnAction(click -> textInput.setText(textInput.getText() + "{$attr}"));
+        substitutionBtn.setOnAction(click -> textInput.setText(textInput.getText() + Attribute.VALUE_REF));
         substitutionBtn.setTooltip(new FastTooltip(Localization.localize("form.insert_substitution")));
         deleteBtn.setOnAction(click -> textInput.setText(""));
 

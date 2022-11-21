@@ -7,7 +7,7 @@ Attributes are generalized properties of objects.
 The values describe the specific properties which the objects possess,
 i.e. color - red.
 
-The question, which asks about the attribute, must contain the word "{$attr}"
+The question, which asks about the attribute, must contain a value reference
 where the application will substitute a value chosen by the player.
 
 [question]

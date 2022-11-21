@@ -5,6 +5,7 @@ import com.zeusz.bsc.core.Object;
 import com.zeusz.bsc.editor.gui.*;
 import com.zeusz.bsc.editor.gui.explorer.SideMenu;
 import com.zeusz.bsc.editor.gui.workspace.form.*;
+import com.zeusz.bsc.editor.validation.Validation;
 import com.zeusz.bsc.editor.validation.ValidationHint;
 import com.zeusz.bsc.editor.validation.ValidationIcon;
 
@@ -71,7 +72,7 @@ public abstract class Workspace<T extends Item> extends BorderPane implements Dr
 
         nameInput.textProperty().addListener((observable, oldValue, newValue) -> {
             // name cannot be empty
-            if(!newValue.matches("\\s*"))
+            if(!newValue.matches(Validation.EMPTY_PATTERN))
                 SideMenu.getActiveLabel().setText(newValue);
         });
 
@@ -92,7 +93,7 @@ public abstract class Workspace<T extends Item> extends BorderPane implements Dr
         TextInput name = (TextInput) fields.get(0);
 
         // name cannot be empty
-        if(name.getText().matches("\\s*"))
+        if(name.getText().matches(Validation.EMPTY_PATTERN))
             item.setName(SideMenu.getActiveLabel().getText());
         else
             item.setName(name.getText());

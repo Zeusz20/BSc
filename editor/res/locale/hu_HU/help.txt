@@ -7,7 +7,7 @@ A tulajdonságok az objektum általánosított jellemzői.
 Az értékek egy specifikus jellemzőt írnak le, amivel az objektum rendelkezik,
 pl.: szín - piros.
 
-A kérdésnek, mely rákérdez a tulajdonságra, tartalmaznia kell egy "{$attr}" karaktersorozatok,
+A kérdésnek, mely rákérdez a tulajdonságra, tartalmaznia kell egy érték referencia karaktersorozatok,
 ahova az alkalmazás be fogja helyettesíteni a játékos által választott értéket.
 
 [question]

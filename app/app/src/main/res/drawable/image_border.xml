@@ -10,8 +10,8 @@
         android:bottom="4dp" />
 
     <stroke
-        android:width="2dp"
-        android:color="@color/white" />
+        android:width="3dp"
+        android:color="@color/title_orange" />
 
     <corners android:radius="8dp" />
 

@@ -20,12 +20,12 @@ public class DeleteDialog extends GameDialog {
         );
 
         setNeutralButton(Localization.localize("word.no"), GameDialog.DISMISS);
-        setPositiveButton(Localization.localize("word.yes"), (dialog, which) -> deleteProject(project, adapter));
+        setPositiveButton(Localization.localize("word.yes"), (dialog, which) -> deleteProject(ctx, project, adapter));
     }
 
-    private void deleteProject(Project project, ProjectListAdapter adapter) {
+    private void deleteProject(Activity ctx, Project project, ProjectListAdapter adapter) {
         if(project.getSource().delete()) {
-            ViewManager.toast(getContext(), Localization.localize("menu.delete_successful"));
+            ViewManager.toast(ctx, Localization.localize("menu.delete_successful"));
             adapter.remove(project.getSource());    // remove file from adapter
             adapter.notifyDataSetChanged();     // refresh view
         }

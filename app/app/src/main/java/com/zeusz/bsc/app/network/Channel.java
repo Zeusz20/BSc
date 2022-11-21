@@ -32,6 +32,7 @@ public abstract class Channel implements Closeable {
     public static boolean isAvailable(Activity ctx) {
         if(SERVER_INFO == null) Channel.fetch();
 
+        // if fetch failed
         if(SERVER_INFO == null) {
             new GameDialog(ctx, Localization.localize("net.server_unavailable")).show();
             return false;

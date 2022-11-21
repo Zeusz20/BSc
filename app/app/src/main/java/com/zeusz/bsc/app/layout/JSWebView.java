@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
@@ -30,7 +33,15 @@ public class JSWebView extends WebView {
         );
     }
 
-    public static JSWebView getWebView() { return webView; }
+    public static JSWebView getWebView() {
+        ViewParent parent = webView.getParent();
+
+        // remove view from previous parent
+        if(parent instanceof ViewGroup)
+            ((ViewGroup) parent).removeView(webView);
+
+        return webView;
+    }
 
     /* Class fields and methods */
     public JSWebView(Context context, AttributeSet attrs) {

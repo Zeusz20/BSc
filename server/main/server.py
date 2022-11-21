@@ -1,5 +1,7 @@
-import json, socket
+import socket
 from threading import Thread
+
+ID_LENGTH = 6
 
 SERVER_INFO = {
     'host': socket.gethostbyname(socket.gethostname()),
@@ -16,7 +18,9 @@ SERVER_INFO = {
     'disconnect': '$_disconnect',   # disconnect from game
     'invalid': '$_invalid',         # invalid game id
     'ping': '$_ping',               # ping server
-    'id_pattern': '^[A-Z0-9]{6}$',
+
+    'id_length': ID_LENGTH,
+    'id_pattern': '^[A-Z0-9]{%d}$' % ID_LENGTH,
 }
 
 _CLOSE_MESSAGES = (SERVER_INFO['disconnect'], '', None)

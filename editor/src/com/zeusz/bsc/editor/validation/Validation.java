@@ -13,6 +13,8 @@ import java.util.function.Predicate;
 
 public class Validation {
 
+    public static final String EMPTY_PATTERN = "\\s*";
+
     /* Validations */
     public static Validation validate(GWObject object) {
         Validation result = new Validation();
@@ -79,7 +81,7 @@ public class Validation {
         Validation validation = new Validation();
 
         // name cannot be empty
-        if(item.getName().matches("\\s*"))
+        if(item.getName().matches(EMPTY_PATTERN))
             validation.getErrors().add(Localization.localize("error.invalid_name"));
 
         // name must be unique
@@ -107,18 +109,17 @@ public class Validation {
 
     private static Validation validateAttribute(Attribute attribute) {
         Validation validation = validateItem(attribute);
-        final String PATTERN = "{$attr}";
 
-        // question must contain "{$attr}" so it can be substituted with the attributes value
-        if(attribute.getQuestion().contains(PATTERN)) {
+        // question must contain value reference so it can be substituted with the attributes value
+        if(attribute.getQuestion().contains(Attribute.VALUE_REF)) {
             // check if pattern occurs ONLY ONCE
-            int substringIndex = attribute.getQuestion().indexOf(PATTERN) + PATTERN.length();
+            int substringIndex = attribute.getQuestion().indexOf(Attribute.VALUE_REF) + Attribute.VALUE_REF.length();
 
-            if(attribute.getQuestion().substring(substringIndex).contains(PATTERN))
-                validation.getErrors().add(Localization.localize("error.too_many_attr_references"));
+            if(attribute.getQuestion().substring(substringIndex).contains(Attribute.VALUE_REF))
+                validation.getErrors().add(Localization.localize("error.too_many_value_refs"));
         }
         else {
-            validation.getErrors().add(Localization.localize("error.missing_attr_reference"));
+            validation.getErrors().add(Localization.localize("error.missing_value_ref"));
         }
 
 
@@ -127,7 +128,7 @@ public class Validation {
             validation.getErrors().add(Localization.localize("error.no_values"));
 
         // values cannot be empty
-        if(attribute.getValues().stream().anyMatch(it -> it.matches("\\s*")))
+        if(attribute.getValues().stream().anyMatch(it -> it.matches(EMPTY_PATTERN)))
             validation.getErrors().add(Localization.localize("error.missing_value"));
 
         return validation;
@@ -136,8 +137,8 @@ public class Validation {
     private static Validation validateQuestion(Question question) {
         Validation validation = validateItem(question);
 
-        if(!question.getText().contains("{$attr}"))
-            validation.getErrors().add(Localization.localize("error.missing_attr_reference"));
+        if(!question.getText().contains(Attribute.VALUE_REF))
+            validation.getErrors().add(Localization.localize("error.missing_value_ref"));
 
         if(question.getAttribute() == null)
             validation.getErrors().add(Localization.localize("error.missing_attribute"));

@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.zeusz.bsc.app.MainActivity;
@@ -65,11 +64,7 @@ public final class ViewManager {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) pixels, ctx.getResources().getDisplayMetrics());
     }
 
-    public static void toast(Context context, String message) {
-        if(context instanceof ContextThemeWrapper)
-            context = ((ContextThemeWrapper) context).getBaseContext();
-
-        final Activity ctx = (Activity) context;
+    public static void toast(Activity ctx, String message) {
         ctx.runOnUiThread(() -> Toast.makeText(ctx, message, Toast.LENGTH_LONG).show());
     }
 
@@ -236,7 +231,7 @@ public final class ViewManager {
         if(view == null)
             view = ctx.getWindow().getDecorView().findViewById(android.R.id.content);
 
-        String[] text = attribute.getQuestion().split("\\{\\$attr\\}");
+        String[] text = attribute.getQuestion().split(Attribute.VALUE_REF_ESCAPED);
 
         TextView name = view.findViewById(R.id.selected_attribute_name);
         TextView question1 = view.findViewById(R.id.question_part_1);

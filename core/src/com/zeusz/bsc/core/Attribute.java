@@ -8,6 +8,9 @@ public class Attribute extends Item {
 
     private static final long serialVersionUID = 4047167163L;
 
+    public static final String VALUE_REF = "{$val}";
+    public static final String VALUE_REF_ESCAPED = "\\{\\$val\\}";
+
     private String question;
     private List<String> values;
 
