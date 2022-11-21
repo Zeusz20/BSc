@@ -19,7 +19,6 @@ SERVER_INFO = {
     'invalid': '$_invalid',         # invalid game id
     'ping': '$_ping',               # ping server
 
-    'id_length': ID_LENGTH,
     'id_pattern': '^[A-Z0-9]{%d}$' % ID_LENGTH,
 }
 
