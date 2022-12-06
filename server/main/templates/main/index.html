@@ -1,0 +1,61 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <!-- Hide cloud app title -->
+    <style>.lead { display: none; }</style>
+
+    <div>
+        <h3 class="d-flex justify-content-center">Kérdezz felelek játék szerkesztő és telefonos alkalmazás Java nyelven</h3>
+        <p class="d-flex justify-content-center">Szakdolgozat | Széchenyi István Egyetem, Győr</p>
+        <p class="d-flex justify-content-center">2022 | Puskás Gábor</p>
+    </div>
+
+    <hr>
+
+    <div>
+        <h4>Leírás</h4>
+        <p>
+            <b>Játékszabályok:</b> A játékhoz két játékos szükséges.
+            A játék elején mindkét játékos választ egy objektumot.
+            Az objektumok rendelkeznek előre definiált tulajdonságokkal, melyekre szintén vannak definiálva arra utaló kérdések.
+            A játék során a játékosok a tulajdonságokra vonatkozó kérdések feltevésével megpróbálják eltalálni ellenfelük választott objektumát.
+        </p>
+        <p>
+            <b>Szerkesztő:</b> A felhasználónak lehetősége van saját objektumokat, tulajdonságokat és kérdéseket létrehozni,
+            melyeket online meg is tud osztani. A játék során ezeket a saját témákat (projekteket) fel lehet használni.
+        </p>
+        <p>
+            <b>Telefonos alkalmazás:</b> A játékszabályok megvalósítása <em>ANDROIDOS</em> környezetben, melyben a felhasználók
+            az általuk létrehozott, vagy már meglévő projektekkel játszhatják a játékot.
+        </p>
+    </div>
+
+    <hr>
+
+    <div>
+        <h4>Letöltések</h4>
+        <table class="table table-bordered border-secondary">
+            <thead>
+                <th colspan="4" class="text-center">Kérdezz felelek szerkesztő</th>
+                <th class="text-center">Kérdezz felelek android játék</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Windows (64 bit)</td>
+                    <td>Linux (64 bit)</td>
+                    <td>MacOS</td>
+                    <td>jar</td>
+                    <td>apk</td>
+                </tr>
+                <tr>
+                    {# TODO: add file downloads on production server !!! #}
+                    <td><a href="">letöltés</a></td>
+                    <td><a href="">letöltés</a></td>
+                    <td><a href="">letöltés</a></td>
+                    <td><a href="">letöltés</a></td>
+                    <td><a href="">letöltés</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

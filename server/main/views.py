@@ -24,8 +24,9 @@ def redirect(root, **get_args):
 # Create your views here
 class IndexView(View):
     def get(self, request):
-        from django.views.debug import default_urlconf
-        return default_urlconf(request)
+        #from django.views.debug import default_urlconf
+        #return default_urlconf(request)
+        return render(request, 'main/index.html')
 
 
 class ProjectView(View):
