@@ -48,12 +48,16 @@
                     <td>apk</td>
                 </tr>
                 <tr>
-                    {# TODO: add file downloads on production server !!! #}
-                    <td><a href="">letöltés</a></td>
-                    <td><a href="">letöltés</a></td>
-                    <td><a href="">letöltés</a></td>
-                    <td><a href="">letöltés</a></td>
-                    <td><a href="">letöltés</a></td>
+                    {% load static %}
+                    <td><a href="{% static 'main/downloads/guess-who-editor-win64.zip' %}">letöltés</a></td>
+                    {% load static %}
+                    <td><a href="{% static 'main/downloads/guess-who-editor-linux.zip' %}">letöltés</a></td>
+                    {% load static %}
+                    <td><a href="{% static 'main/downloads/guess-who-editor-mac.zip' %}">letöltés</a></td>
+                    {% load static %}
+                    <td><a href="{% static 'main/downloads/guess-who-editor.jar' %}">letöltés</a></td>
+                    {% load static %}
+                    <td><a href="{% static 'main/downloads/guess-who.apk' %}">letöltés</a></td>
                 </tr>
             </tbody>
         </table>
